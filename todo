@@ -1,0 +1,4 @@
+ - get working on the S3
+ - move init to a class and prevent the errors on startup
+ - replace raw files
+ - lots more
