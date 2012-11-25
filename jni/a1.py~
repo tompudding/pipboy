@@ -1,0 +1,6 @@
+import sys,re
+
+data = sys.stdin.read()
+
+for word in re.findall('................',data):
+    print word
