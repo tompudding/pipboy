@@ -5,4 +5,5 @@ done - replace raw files
      - move configuration to a text file
      - fix the lifecycle stuff, which may be related to the next thing
      - fix the weird occasional black screen issue
+     - loading screen / error messages
      - lots more
