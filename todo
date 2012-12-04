@@ -1,4 +1,8 @@
- - get working on the S3
- - move init to a class and prevent the errors on startup
- - replace raw files
- - lots more
+done - get working on the S3
+     - move init to a class and prevent the errors on startup
+done - replace raw files
+     - move the sounds to the zip file
+     - move configuration to a text file
+     - fix the lifecycle stuff, which may be related to the next thing
+     - fix the weird occasional black screen issue
+     - lots more
