@@ -180,7 +180,7 @@ Image::Image(const char *filename, GLfloat _width, GLfloat _height, GLfloat *tex
     }
     // set the individual row_pointers to point at the correct offsets of image_data
     for (int i = 0; i < theight; ++i)
-        row_pointers[theight - 1 - i] = data + i * rowbytes;
+        row_pointers[i] = data + i * rowbytes;
     //read the png into image_data through row_pointers
     png_read_image(png_ptr, row_pointers);
     RefreshTexture();
@@ -211,7 +211,7 @@ exit:
 
 void Image::RefreshTexture() {
     texture = GenTexture(file_width,file_height,data);
-    LOGE("Refreshing texture:%s",fname);
+    LOGE("Refreshing texture:%s %d:%d:%p",fname,file_width,file_height,data);
 }
 
 void Image::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {
