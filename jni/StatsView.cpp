@@ -249,13 +249,13 @@ SpecialSubView::SpecialSubView() : selected_box(0.42,0.08,0.007),box(0.78,0.08,0
     names[6] = "Luck";
 
 
-    icons[0] = new Image(DATA_DIR "special_strength.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[1] = new Image(DATA_DIR "special_perception.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[2] = new Image(DATA_DIR "special_endurance.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[3] = new Image(DATA_DIR "special_charisma.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[4] = new Image(DATA_DIR "special_intelligence.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[5] = new Image(DATA_DIR "special_agility.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[6] = new Image(DATA_DIR "special_luck.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
+    icons[0] = new Image("special_strength.png",480./800,1.0,standard_tex_coords);
+    icons[1] = new Image("special_perception.png",480./800,1.0,standard_tex_coords);
+    icons[2] = new Image("special_endurance.png",480./800,1.0,standard_tex_coords);
+    icons[3] = new Image("special_charisma.png",480./800,1.0,standard_tex_coords);
+    icons[4] = new Image("special_intelligence.png",480./800,1.0,standard_tex_coords);
+    icons[5] = new Image("special_agility.png",480./800,1.0,standard_tex_coords);
+    icons[6] = new Image("special_luck.png",480./800,1.0,standard_tex_coords);
 
     for(int i=0;i<7;i++)
     {
@@ -364,19 +364,19 @@ SkillsSubView::SkillsSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.0
     memcpy(stats,temp_stats,sizeof(stats));
     memcpy(names,temp_names,sizeof(names));
 
-    icons[ 0] = new Image(DATA_DIR "skills_barter.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 1] = new Image(DATA_DIR "skills_energy_weapons.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 2] = new Image(DATA_DIR "skills_explosives.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 3] = new Image(DATA_DIR "skills_small_guns.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 4] = new Image(DATA_DIR "skills_lockpick.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 5] = new Image(DATA_DIR "skills_medicine.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 6] = new Image(DATA_DIR "skills_melee_weapons.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 7] = new Image(DATA_DIR "skills_repair.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 8] = new Image(DATA_DIR "skills_science.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 9] = new Image(DATA_DIR "skills_sneak.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[10] = new Image(DATA_DIR "skills_speech.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[11] = new Image(DATA_DIR "skills_survival.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[12] = new Image(DATA_DIR "skills_unarmed.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
+    icons[ 0] = new Image("skills_barter.png",480./800,1.0,standard_tex_coords);
+    icons[ 1] = new Image("skills_energy_weapons.png",480./800,1.0,standard_tex_coords);
+    icons[ 2] = new Image("skills_explosives.png",480./800,1.0,standard_tex_coords);
+    icons[ 3] = new Image("skills_small_guns.png",480./800,1.0,standard_tex_coords);
+    icons[ 4] = new Image("skills_lockpick.png",480./800,1.0,standard_tex_coords);
+    icons[ 5] = new Image("skills_medicine.png",480./800,1.0,standard_tex_coords);
+    icons[ 6] = new Image("skills_melee_weapons.png",480./800,1.0,standard_tex_coords);
+    icons[ 7] = new Image("skills_repair.png",480./800,1.0,standard_tex_coords);
+    icons[ 8] = new Image("skills_science.png",480./800,1.0,standard_tex_coords);
+    icons[ 9] = new Image("skills_sneak.png",480./800,1.0,standard_tex_coords);
+    icons[10] = new Image("skills_speech.png",480./800,1.0,standard_tex_coords);
+    icons[11] = new Image("skills_survival.png",480./800,1.0,standard_tex_coords);
+    icons[12] = new Image("skills_unarmed.png",480./800,1.0,standard_tex_coords);
 
     for(int i=0;i<13;i++)
         items.push_back( PlacementInfo(0.17,0.8-0.08*i,1.4,1.4,new Text(names[i],font)) );
@@ -481,19 +481,19 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
     memcpy(descriptions,temp_desc,sizeof(descriptions));
     memcpy(names,temp_names,sizeof(names));
 
-    icons[ 0] = new Image(DATA_DIR "perk_life_giver.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 1] = new Image(DATA_DIR "perk_action_boy.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 2] = new Image(DATA_DIR "perk_chemist.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 3] = new Image(DATA_DIR "perk_comprehension.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 4] = new Image(DATA_DIR "perk_l33t_haxx0r.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 5] = new Image(DATA_DIR "perk_robotics_expert.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 6] = new Image(DATA_DIR "perk_educated.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 7] = new Image(DATA_DIR "perk_four_eyes.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 8] = new Image(DATA_DIR "perk_math_wrath.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[ 9] = new Image(DATA_DIR "perk_nerd_rage!.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[10] = new Image(DATA_DIR "perk_swift_learner.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[11] = new Image(DATA_DIR "perk_travel_light.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
-    icons[12] = new Image(DATA_DIR "perk_challenge.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
+    icons[ 0] = new Image("perk_life_giver.png",480./800,1.0,standard_tex_coords);
+    icons[ 1] = new Image("perk_action_boy.png",480./800,1.0,standard_tex_coords);
+    icons[ 2] = new Image("perk_chemist.png",480./800,1.0,standard_tex_coords);
+    icons[ 3] = new Image("perk_comprehension.png",480./800,1.0,standard_tex_coords);
+    icons[ 4] = new Image("perk_l33t_haxx0r.png",480./800,1.0,standard_tex_coords);
+    icons[ 5] = new Image("perk_robotics_expert.png",480./800,1.0,standard_tex_coords);
+    icons[ 6] = new Image("perk_educated.png",480./800,1.0,standard_tex_coords);
+    icons[ 7] = new Image("perk_four_eyes.png",480./800,1.0,standard_tex_coords);
+    icons[ 8] = new Image("perk_math_wrath.png",480./800,1.0,standard_tex_coords);
+    icons[ 9] = new Image("perk_nerd_rage!.png",480./800,1.0,standard_tex_coords);
+    icons[10] = new Image("perk_swift_learner.png",480./800,1.0,standard_tex_coords);
+    icons[11] = new Image("perk_travel_light.png",480./800,1.0,standard_tex_coords);
+    icons[12] = new Image("perk_challenge.png",480./800,1.0,standard_tex_coords);
 
     for(int i=0;i<13;i++)
         items.push_back( PlacementInfo(0.17,0.8-0.08*i,1.4,1.4,new Text(names[i],font)) );
@@ -511,7 +511,7 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
 GeneralSubView::GeneralSubView() : selected_box(0.46,0.08,0.007) {
     pthread_mutex_init(&items_mutex,NULL);
 
-    icon = new Image(DATA_DIR "reputations_novac.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
+    icon = new Image("reputations_novac.png",480./800,1.0,standard_tex_coords);
     if(icon == NULL)
         throw MEMORY_ERROR;
 

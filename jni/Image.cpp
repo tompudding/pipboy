@@ -85,35 +85,41 @@ Image::Image(const char *filename, GLfloat _width, GLfloat _height, GLfloat *tex
 
     z = zip_open(DATA_DIR ZIP_FILENAME, 0, &err);
     if(NULL == z) {
+        LOGI("Error opening %s\n",DATA_DIR ZIP_FILENAME);
         status = FILE_NOT_FOUND;
         goto exit;
     }
         
     file = zip_fopen(z, filename, 0);
     if(NULL == file) {
+        LOGI("Error opening %s from within zip\n",filename);
         status = FILE_NOT_FOUND;
-        goto close_zip;
+        goto exit;
     }
 
     
     if(8 != zip_fread(file, header, 8)) {
+        LOGI("Error reading header for %s\n",filename);
         status = FILE_ERROR;
         goto close_zip;
     }
 
     if(png_sig_cmp(header, 0, 8)) {
+        LOGI("invalid header for %s\n",filename);
         status = FILE_ERROR;
         goto close_zip;
     }
 
     png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (NULL == png_ptr) {
+        LOGI("png_ptr error for %s\n",filename);
         status = MEMORY_ERROR;
         goto close_zip;
     }
 
     info_ptr = png_create_info_struct(png_ptr);
     if (NULL == info_ptr) {
+        LOGI("info_ptr error for %s\n",filename);
         end_info  = NULL;
         status = MEMORY_ERROR;
         goto free_png_ptr;
@@ -121,18 +127,20 @@ Image::Image(const char *filename, GLfloat _width, GLfloat _height, GLfloat *tex
 
     end_info = png_create_info_struct(png_ptr);
     if(NULL == end_info) {
+        LOGI("end_info error for %s\n",filename);
         status = MEMORY_ERROR;
         goto free_png_ptr;
     }
 
     if (setjmp(png_jmpbuf(png_ptr))) {
+        LOGI("processing_error for %s\n",filename);
         status = FILE_ERROR;
         goto free_data;
     }
 
     //init png reading
     //png_init_io(png_ptr, fp);
-    png_set_read_fn(png_ptr, NULL, png_zip_read);
+    png_set_read_fn(png_ptr, file, png_zip_read);
 
     //let libpng know you already read the first 8 bytes
     png_set_sig_bytes(png_ptr, 8);
@@ -158,28 +166,23 @@ Image::Image(const char *filename, GLfloat _width, GLfloat _height, GLfloat *tex
         status = MEMORY_ERROR;
         goto free_png_ptr;
     }
-
     data = new png_byte[rowbytes * theight];
     if (!data) {
         //clean up memory and close stuff
         status = MEMORY_ERROR;
         goto free_data;
     }
-
     //row_pointers is for pointing to image_data for reading the png with libpng
     row_pointers = new png_bytep[theight];
     if (NULL == row_pointers) {
         status = MEMORY_ERROR;
         goto free_data;
     }
-
     // set the individual row_pointers to point at the correct offsets of image_data
     for (int i = 0; i < theight; ++i)
         row_pointers[theight - 1 - i] = data + i * rowbytes;
-
     //read the png into image_data through row_pointers
     png_read_image(png_ptr, row_pointers);
-
     RefreshTexture();
 
     memcpy(mFVertexBuffer,coords,sizeof(mFVertexBuffer));
@@ -201,6 +204,7 @@ close_zip:
     zip_fclose(file);
 exit:
     if(status != OK) {
+        LOGI("Error status %d processing file %s\n",status,filename);
         throw status;
     }
 }

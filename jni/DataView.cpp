@@ -15,10 +15,10 @@ DataView::DataView (const char *background_filename, Font *_font) {
     boxes[0] = new PlacementInfo(0.29,0.005,1,1, new Box(0.210,0.08,0.007));
     boxes[1] = new PlacementInfo(0.293,0.005,1,1, new Box(0.205,0.08,0.007));
 
-    waves[0] = left     = new Image(DATA_DIR     "left.dimensions_256x256.raw",0.63*(480./800),0.482,standard_tex_coords);
-    waves[1] = forward  = new Image(DATA_DIR  "forward.dimensions_256x256.raw",0.63*(480./800),0.482,standard_tex_coords);
-    waves[2] = backward = new Image(DATA_DIR "backward.dimensions_256x256.raw",0.63*(480./800),0.482,standard_tex_coords);
-    waves[3] = wave     = new Image(DATA_DIR    "wave.dimensions_1024x256.raw",0.63*(480./800),0.482,standard_tex_coords);
+    waves[0] = left     = new Image(    "left.png",0.63*(480./800),0.482,standard_tex_coords);
+    waves[1] = forward  = new Image( "forward.png",0.63*(480./800),0.482,standard_tex_coords);
+    waves[2] = backward = new Image("backward.png",0.63*(480./800),0.482,standard_tex_coords);
+    waves[3] = wave     = new Image(    "wave.png",0.63*(480./800),0.482,standard_tex_coords);
 
     /*ItemCode panel_codes[] = {PANEL_BATTLESTAR,
                               PANEL_GAMEOFTHRONES ,

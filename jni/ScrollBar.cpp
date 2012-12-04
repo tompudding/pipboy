@@ -2,9 +2,9 @@
 #include <unistd.h>
 
 ScrollBar::ScrollBar() {
-    top = new Image(DATA_DIR "chevrons.dimensions_64x32.raw",480.0/800,1,standard_tex_coords);
-    bottom = new Image(DATA_DIR "chevrons1.dimensions_64x32.raw",480.0/800,1,standard_tex_coords);
-    bar = new Image(DATA_DIR "bar.dimensions_64x64.raw",480.0/800,1,standard_tex_coords);
+    top = new Image( "chevrons.png",480.0/800,1,standard_tex_coords);
+    bottom = new Image( "chevrons1.png",480.0/800,1,standard_tex_coords);
+    bar = new Image( "bar.png",480.0/800,1,standard_tex_coords);
 }
 
 ScrollBar::~ScrollBar() {

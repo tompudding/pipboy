@@ -9,7 +9,7 @@ ItemList::ItemList(EquippedItems *a) : selected_box(0.52,0.08,0.007),selected_bo
     display_num = 8;
     scrollbar = new ScrollBar();
     scrollbar->SetData(itemlist.size(),display_start,display_num);
-    equipped_box = new Image("notthere.dimensions_1x1.raw",480.0/800,1,standard_tex_coords);
+    equipped_box = new Image("full.png",480.0/800,1,standard_tex_coords);
 }
 
 ItemList::~ItemList() {
@@ -35,7 +35,7 @@ Item::Item(const char *_name,const char *filename, Font *font) {
 }
 
 Item::Item(const ItemData *data,Font *font){
-    char temp_path[1024] = DATA_DIR "icons/";
+    char temp_path[1024] = "icons/";
     weight = data->weight;
     damage = data->damage;
     requirements = data->requirements;
@@ -49,9 +49,14 @@ Item::Item(const ItemData *data,Font *font){
     code = data->code;
     type = data->type;
     
-    strncat(temp_path,data->filename,sizeof(temp_path));
-    LOGI("Trying to open %s",temp_path);
-    icon = new Image(temp_path,1.0*480/800,1.0,standard_tex_coords);
+    if(data->type != RADIO) {
+        strncat(temp_path,data->filename,sizeof(temp_path));
+        LOGI("Trying to open %s",temp_path);
+        icon = new Image(temp_path,1.0*480/800,1.0,standard_tex_coords);
+    }
+    else {
+        icon = NULL;
+    }
     text = new Text(name,font);
     LOGI("Item constructor %s %p %p",name,icon,text);
 }

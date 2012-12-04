@@ -78,16 +78,16 @@ JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_in
     }
     else {
         initialised = 1;
-        glare     = new Image(DATA_DIR "screenglare_alpha.png.raw",0.8,1.0,standard_tex_coords);
-        fade      = new Image(DATA_DIR "fade.dimensions_64x64.raw",1.0,1.0,standard_tex_coords);
-        band      = new Image(DATA_DIR "band.png.raw",0.8,0.5,tex_coords);
-        scanlines = new Image(DATA_DIR "scanline.png.raw",0.8,1.0,scanline_coords);
-        icon_explosives = new Image(DATA_DIR "weap_skill_icon_explosives.dimensions_64x64.raw",1.0,1.0,standard_tex_coords);
-        icon_energy     = new Image(DATA_DIR "weap_skill_icon_energy.dimensions_64x64.raw",1.0,1.0,standard_tex_coords);
-        icon_bigguns    = new Image(DATA_DIR "weap_skill_icon_bigguns.dimensions_64x64.raw",1.0,1.0,standard_tex_coords);
-        icon_unarmed    = new Image(DATA_DIR "weap_skill_icon_unarmed.dimensions_64x64.raw",1.0,1.0,standard_tex_coords);
-        icon_sm_arms    = new Image(DATA_DIR "weap_skill_icon_sm_arms.dimensions_64x64.raw",1.0,1.0,standard_tex_coords);
-        icon_melee      = new Image(DATA_DIR "weap_skill_icon_melee.dimensions_64x64.raw",1.0,1.0,standard_tex_coords);
+        glare     = new Image("screenglare_alpha.png",0.8,1.0,standard_tex_coords);
+        fade      = new Image("fade.png",1.0,1.0,standard_tex_coords);
+        band      = new Image("band.png",0.8,0.5,tex_coords);
+        scanlines = new Image("scanline.png",0.8,1.0,scanline_coords);
+        icon_explosives = new Image("weap_skill_icon_explosives.png",1.0,1.0,standard_tex_coords);
+        icon_energy     = new Image("weap_skill_icon_energy.png",1.0,1.0,standard_tex_coords);
+        icon_bigguns    = new Image("weap_skill_icon_big_guns.png",1.0,1.0,standard_tex_coords);
+        icon_unarmed    = new Image("weap_skill_icon_unarmed.png",1.0,1.0,standard_tex_coords);
+        icon_sm_arms    = new Image("weap_skill_icon_sm_arms.png",1.0,1.0,standard_tex_coords);
+        icon_melee      = new Image("weap_skill_icon_melee.png",1.0,1.0,standard_tex_coords);
         //arrow           = new Image(DATA_DIR "arrow.dimension_64x64.raw",1.0,1.0,standard_tex_coords);
     
         try {
@@ -104,7 +104,7 @@ JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_in
                                            NULL};
             //if(NULL == listener)
             //    listener  = new Listener();
-            font      = new Font(DATA_DIR "monofonto_verylarge02_dialogs2.png.raw",DATA_DIR "monofonto_verylarge02_dialogs2.fnt");
+            font      = new Font("monofonto_verylarge02_dialogs2.png",DATA_DIR "monofonto_verylarge02_dialogs2.fnt");
             general_text = new Text("balls",font);
             //do 12 random weapons
 
