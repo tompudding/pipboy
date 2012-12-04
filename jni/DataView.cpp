@@ -167,7 +167,7 @@ void DataView::Select() {
 
 
 RadioItem::RadioItem(const ItemData *data,Font *font) : Item(data,font),box(0.5,0.08,0.007){
-    char temp_path[1024] = "/mnt/sdcard/pygame/pipboy/";
+    char temp_path[1024] = DATA_DIR;
     name = strdup(data->name);
     code = data->code;
     type = data->type;

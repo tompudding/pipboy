@@ -15,13 +15,27 @@
 LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
+LOCAL_MODULE    := libzip
+LOCAL_SRC_FILES := libzip.a
+
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE    := libpng
+LOCAL_SRC_FILES := libpng.a
+
+include $(PREBUILT_STATIC_LIBRARY)
+
+
+include $(CLEAR_VARS)
 
 LOCAL_MODULE    := libnativepipboy
 LOCAL_CFLAGS    := -Werror
 LOCAL_CPPFLAGS += -fexceptions 
 LOCAL_SRC_FILES := gl_code.cpp Character.cpp StatsView.cpp Image.cpp Text.cpp Box.cpp ViewList.cpp native-audio-jni.c Sound.cpp Listener.cpp Items.cpp itemdata.cpp ScrollBar.cpp ItemsView.cpp DataView.cpp
-LOCAL_LDLIBS    := -llog -lGLESv1_CM -lstdc++ -lOpenSLES
-LOCAL_STATIC_LIBRARIES := libpng
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../libpng-android/jni
+LOCAL_LDLIBS    := -L$(SYSROOT)/usr/lib -lz -llog -lGLESv1_CM -lstdc++ -lOpenSLES
+LOCAL_STATIC_LIBRARIES := libpng libzip
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../android-ndk-assets/project/jni/libpng  $(LOCAL_PATH)/../android-ndk-assets/project/jni/libzip
+APP_PLATFORM := android-9
 
 include $(BUILD_SHARED_LIBRARY)

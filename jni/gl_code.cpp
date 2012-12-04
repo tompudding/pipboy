@@ -153,7 +153,7 @@ JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_st
      */
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);checkGlError(__LINE__);
-    glClear(GL_COLOR_BUFFER_BIT );checkGlError(__LINE__);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);checkGlError(__LINE__);
 
     /*
      * Now we're ready to draw some 3D objects

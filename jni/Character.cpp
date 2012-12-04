@@ -1,13 +1,13 @@
 #include "gl_code.h"
 
 Character::Character() {
-    heads      = new Image("/mnt/sdcard/pygame/pipboy/head.png.raw",0.25*480/800,0.25,standard_tex_coords);
-    faces      = new Image("/mnt/sdcard/pygame/pipboy/face.png.raw",0.125*480/800,0.125,standard_tex_coords);
-    left_legs  = new Image("/mnt/sdcard/pygame/pipboy/left_leg.png.raw",0.25*480/800,0.25,standard_tex_coords);
-    right_legs = new Image("/mnt/sdcard/pygame/pipboy/right_leg.png.raw",0.25*480/800,0.25,standard_tex_coords);
-    right_arms = new Image("/mnt/sdcard/pygame/pipboy/right_arm.png.raw",0.25*480/800,0.125,standard_tex_coords);
-    left_arms  = new Image("/mnt/sdcard/pygame/pipboy/left_arm.png.raw",0.25*480/800,0.125,standard_tex_coords);
-    torsos     = new Image("/mnt/sdcard/pygame/pipboy/torso.png.raw",0.25*480/800,0.25,standard_tex_coords);
+    heads      = new Image(DATA_DIR "head.png.raw",0.25*480/800,0.25,standard_tex_coords);
+    faces      = new Image(DATA_DIR "face.png.raw",0.125*480/800,0.125,standard_tex_coords);
+    left_legs  = new Image(DATA_DIR "left_leg.png.raw",0.25*480/800,0.25,standard_tex_coords);
+    right_legs = new Image(DATA_DIR "right_leg.png.raw",0.25*480/800,0.25,standard_tex_coords);
+    right_arms = new Image(DATA_DIR "right_arm.png.raw",0.25*480/800,0.125,standard_tex_coords);
+    left_arms  = new Image(DATA_DIR "left_arm.png.raw",0.25*480/800,0.125,standard_tex_coords);
+    torsos     = new Image(DATA_DIR "torso.png.raw",0.25*480/800,0.25,standard_tex_coords);
 
     title      = new Text("Tom Gooding - Level 19",font);
 }

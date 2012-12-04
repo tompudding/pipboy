@@ -258,11 +258,19 @@ SpecialSubView::SpecialSubView() : selected_box(0.42,0.08,0.007),box(0.78,0.08,0
     icons[6] = new Image(DATA_DIR "special_luck.dimensions_256x256.raw",480./800,1.0,standard_tex_coords);
 
     for(int i=0;i<7;i++)
-        items.push_back( PlacementInfo(0.17,0.8-0.08*i,1.4,1.4,new Text(names[i],font)) );
+    {
+        Text *t = new Text(names[i],font);
+        if(NULL == t) {
+            throw MEMORY_ERROR;
+        }
+        items.push_back( PlacementInfo(0.17,0.8-0.08*i,1.4,1.4,t) );
+    }
 
     for(int i=0;i<7;i++)
         if(icons[i] == NULL)
             throw MEMORY_ERROR; //memory leak fixme
+
+    current_item = 0;
     
 }
 
@@ -660,7 +668,7 @@ void PerksSubView::VerticalPos(float pos,int sound) {
             scrollbar->SetData(items.size(),display_start,display_num);
         }
         pthread_mutex_unlock(&items_mutex);
-    }
+   } 
 }
 
 void StatsView::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {

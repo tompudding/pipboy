@@ -4,9 +4,9 @@
 ViewList::ViewList() {
     pthread_mutex_init(&viewlist_mutex,NULL);
     pthread_mutex_lock(&viewlist_mutex);
-    viewlist.push_back(new StatsView("/mnt/sdcard/pygame/pipboy/stats_bg.png.raw",font));
-    viewlist.push_back(new ItemsView("/mnt/sdcard/pygame/pipboy/items_bg.png.raw",font));
-    viewlist.push_back(new DataView("/mnt/sdcard/pygame/pipboy/data_bg.png.raw",font));
+    viewlist.push_back(new StatsView(DATA_DIR "stats_bg.png.raw",font));
+    viewlist.push_back(new ItemsView(DATA_DIR "items_bg.png.raw",font));
+    viewlist.push_back(new DataView(DATA_DIR "data_bg.png.raw",font));
     current_view = viewlist.begin();
     pthread_mutex_unlock(&viewlist_mutex);
 }
@@ -21,8 +21,7 @@ View *ViewList::CurrentView()
 {
     View *out = NULL;
     pthread_mutex_lock(&viewlist_mutex);
-    if(current_view)
-        out = *current_view;
+    out = *current_view;
     pthread_mutex_unlock(&viewlist_mutex);
     return out;
 }

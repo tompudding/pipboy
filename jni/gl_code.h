@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <png.h>
+#include <zip.h>
 #include <map>
 #include <list>
 #include <pthread.h>
@@ -75,6 +76,7 @@ JNIEXPORT jboolean JNICALL Java_com_google_android_opengles_triangle_NativePipbo
 #endif
 
 enum error {
+    OK,
     FILE_NOT_FOUND,
     FILE_ERROR,
     BIND_ERROR,
@@ -769,6 +771,7 @@ extern ItemData itemdata[];
 extern size_t numitems;
 extern itemmap_t item_map;
 
-#define DATA_DIR "/mnt/sdcard/pygame/pipboy/"
+#define DATA_DIR "/storage/sdcard1/pipboy/"
+#define ZIP_FILENAME "data.zip"
 
 #endif

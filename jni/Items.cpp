@@ -35,7 +35,7 @@ Item::Item(const char *_name,const char *filename, Font *font) {
 }
 
 Item::Item(const ItemData *data,Font *font){
-    char temp_path[1024] = "/mnt/sdcard/pygame/pipboy/icons/";
+    char temp_path[1024] = DATA_DIR "icons/";
     weight = data->weight;
     damage = data->damage;
     requirements = data->requirements;
