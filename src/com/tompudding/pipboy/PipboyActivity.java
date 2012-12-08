@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.opengles.triangle;
+package com.tompudding.pipboy;
 
 import javax.microedition.khronos.opengles.GL;
 
@@ -88,7 +88,7 @@ class MyGestureDetector extends SimpleOnGestureListener implements OnClickListen
 
 }
 
-public class TriangleActivity extends Activity implements OnClickListener{
+public class PipboyActivity extends Activity implements OnClickListener{
 
     /** Set to true to enable checking of the OpenGL error code after every OpenGL call. Set to
      * false for faster code.
@@ -119,7 +119,7 @@ public class TriangleActivity extends Activity implements OnClickListener{
                 return false;
             }
         });
-        mGLView.setOnClickListener(TriangleActivity.this); 
+        mGLView.setOnClickListener(PipboyActivity.this); 
 
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -133,7 +133,7 @@ public class TriangleActivity extends Activity implements OnClickListener{
                     return GLDebugHelper.wrap(gl, GLDebugHelper.CONFIG_CHECK_GL_ERROR, null);
                 }});
         }
-        mGLView.setRenderer(new TriangleRenderer(this));
+        mGLView.setRenderer(new PipboyRenderer(this));
         mGLView.requestFocus();
         
     }

@@ -47,7 +47,7 @@ void checkGlError(int op) {
     }
 }
 
-JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_init  (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init  (JNIEnv *, jclass) {
     GLfloat tex_coords[] = {0,1.0,
                             0,0,
                             4.0,0.0,
@@ -140,7 +140,7 @@ JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_in
     LOGI("init monkey: %p %p",glare,viewlist);
 }
 
-JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_step (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_step (JNIEnv *, jclass) {
     glDisable(GL_DITHER);checkGlError(__LINE__);
 
     glTexEnvx(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
@@ -205,7 +205,7 @@ GLuint GenTexture(uint32_t w,uint32_t h,uint8_t *data) {
     return out;
 }
 
-JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_TouchEvent  (JNIEnv *, jclass, jfloat _x, jfloat _y) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_TouchEvent  (JNIEnv *, jclass, jfloat _x, jfloat _y) {
     float x = _x;
     float y = _y;
     LOGI("Native Touch event! %.2f %.2f",x,y);
@@ -243,23 +243,23 @@ JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_To
     
 }
 
-JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_LeftSwipe (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LeftSwipe (JNIEnv *, jclass) {
     LOGI("native leftswipe");
     viewlist->Prev();
 }
 
-JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_RightSwipe (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_RightSwipe (JNIEnv *, jclass) {
     LOGI("native rightswipe");
     viewlist->Next();
 }
 
-JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_LongPress (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LongPress (JNIEnv *, jclass) {
     LOGI("native longpress");
     viewlist->Select();
 }
 
 
-JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_MenuButton  (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_MenuButton  (JNIEnv *, jclass) {
     LOGI("m1");
     viewlist->Select();
 }

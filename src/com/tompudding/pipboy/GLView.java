@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.android.opengles.triangle;
+package com.tompudding.pipboy;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
+import android.view.KeyEvent;
+import android.graphics.PixelFormat;
+import android.util.Log;
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
@@ -89,6 +91,7 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
      * Inform the view that the activity is paused.
      */
     public void onPause() {
+        Log.i("nativepipboy","glview::onpause");
         mGLThread.onPause();
     }
 
@@ -96,6 +99,7 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
      * Inform the view that the activity is resumed.
      */
     public void onResume() {
+        Log.i("nativepipboy","glview::onresume");
         mGLThread.onResume();
     }
 
@@ -117,6 +121,7 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     protected void onDetachedFromWindow() {
+        Log.i("nativepipboy","ondetachedfromwindow");
         super.onDetachedFromWindow();
         mGLThread.requestExitAndWait();
     }
@@ -205,6 +210,8 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
             mEglContext = mEgl.eglCreateContext(mEglDisplay, mEglConfig,
                     EGL10.EGL_NO_CONTEXT, null);
 
+            getHolder().setFormat(PixelFormat.RGBA_8888);
+
             mEglSurface = null;
         }
 
@@ -245,6 +252,7 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
             if (mGLWrapper != null) {
                 gl = mGLWrapper.wrap(gl);
             }
+
             return gl;
         }
 

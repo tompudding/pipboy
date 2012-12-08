@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.opengles.triangle;
+package com.tompudding.pipboy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,9 +34,9 @@ import android.util.Log;
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.opengles.GL10;
 
-public class TriangleRenderer implements GLView.Renderer{
+public class PipboyRenderer implements GLView.Renderer{
 
-    public TriangleRenderer(Context context) {
+    public PipboyRenderer(Context context) {
         mContext = context;
         //mGlare = new Triangle(1.0f,1.0f,1.0f,1.0f);
         //mBand = new Triangle(1.0f,0.27f,4.0f,1.0f);
@@ -85,14 +85,14 @@ public class TriangleRenderer implements GLView.Renderer{
     }
 
     private Context mContext;
-    private Triangle mGlare;
-    private Triangle mBand;
+    private Pipboy mGlare;
+    private Pipboy mBand;
     private int NUM_TEXTURES=3;
     private int[] mTextureID = {0,0,0};
 }
 
-class Triangle {
-    public Triangle(float width, float height, float texwidth, float texheight) {
+class Pipboy {
+    public Pipboy(float width, float height, float texwidth, float texheight) {
 
         // Buffers to be passed to gl*Pointer() functions
         // must be direct, i.e., they must be placed on the

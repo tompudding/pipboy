@@ -35,35 +35,35 @@ using namespace std;
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
-#ifndef _Included_com_google_android_opengles_triangle_NativePipboy
-#define _Included_com_google_android_opengles_triangle_NativePipboy
+#ifndef _Included_com_tompudding_pipboy_NativePipboy
+#define _Included_com_tompudding_pipboy_NativePipboy
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*
- * Class:     com_google_android_opengles_triangle_NativePipboy
+ * Class:     com_tompudding_pipboy_NativePipboy
  * Method:    init
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_init
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init
   (JNIEnv *, jclass);
 
 /*
- * Class:     com_google_android_opengles_triangle_NativePipboy
+ * Class:     com_tompudding_pipboy_NativePipboy
  * Method:    step
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_step
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_step
   (JNIEnv *, jclass);
 
-    JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_TouchEvent (JNIEnv *, jclass, jfloat x, jfloat y);
+    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_TouchEvent (JNIEnv *, jclass, jfloat x, jfloat y);
 
-JNIEXPORT jboolean JNICALL Java_com_google_android_opengles_triangle_NativePipboy_selectClip(JNIEnv* env, jclass clazz, jint which,jint count);
+JNIEXPORT jboolean JNICALL Java_com_tompudding_pipboy_NativePipboy_selectClip(JNIEnv* env, jclass clazz, jint which,jint count);
 
-    JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_MenuButton (JNIEnv *, jclass);
-    JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_LeftSwipe (JNIEnv *, jclass);
-    JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_RightSwipe (JNIEnv *, jclass);
-    JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_LongPress (JNIEnv *, jclass);
+    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_MenuButton (JNIEnv *, jclass);
+    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LeftSwipe (JNIEnv *, jclass);
+    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_RightSwipe (JNIEnv *, jclass);
+    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LongPress (JNIEnv *, jclass);
     
 
     int GetExit();

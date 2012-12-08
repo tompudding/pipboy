@@ -142,7 +142,7 @@ void bqPlayerCallback1(SLAndroidSimpleBufferQueueItf bq, void *context)
 
 
 // create the engine and output mix objects
-void Java_com_google_android_opengles_triangle_NativePipboy_createEngine(JNIEnv* env, jclass clazz)
+void Java_com_tompudding_pipboy_NativePipboy_createEngine(JNIEnv* env, jclass clazz)
 {
     SLresult result;
     int trials = 0;
@@ -268,7 +268,7 @@ void createPlayer(SLObjectItf *PlayerObject,
 }
 
 // create buffer queue audio player
-void Java_com_google_android_opengles_triangle_NativePipboy_createBufferQueueAudioPlayer(JNIEnv* env,
+void Java_com_tompudding_pipboy_NativePipboy_createBufferQueueAudioPlayer(JNIEnv* env,
                                                                                          jclass clazz) {
     createPlayer(&bqPlayerObject,&bqPlayerPlay,&bqPlayerBufferQueue,&bqPlayerEffectSend,bqPlayerCallback);
     createPlayer(&bqPlayerObject1,&bqPlayerPlay1,&bqPlayerBufferQueue1,&bqPlayerEffectSend1,bqPlayerCallback1);
@@ -296,7 +296,7 @@ uint32_t CurrentlyPlaying() {
 
 // create asset audio player
 /*
-jboolean Java_com_google_android_opengles_triangle_NativePipboy_createAssetAudioPlayer(JNIEnv* env, jclass clazz,
+jboolean Java_com_tompudding_pipboy_NativePipboy_createAssetAudioPlayer(JNIEnv* env, jclass clazz,
         jobject assetManager, jstring filename)
 {
     SLresult result;
@@ -361,7 +361,7 @@ jboolean Java_com_google_android_opengles_triangle_NativePipboy_createAssetAudio
 
 
 // set the playing state for the asset audio player
-void Java_com_google_android_opengles_triangle_NativePipboy_setPlayingAssetAudioPlayer(JNIEnv* env,
+void Java_com_tompudding_pipboy_NativePipboy_setPlayingAssetAudioPlayer(JNIEnv* env,
         jclass clazz, jboolean isPlaying)
 {
     SLresult result;
@@ -379,7 +379,7 @@ void Java_com_google_android_opengles_triangle_NativePipboy_setPlayingAssetAudio
     }*/
 
 // shut down the native audio system
-void Java_com_google_android_opengles_triangle_NativePipboy_shutdown(JNIEnv* env, jclass clazz)
+void Java_com_tompudding_pipboy_NativePipboy_shutdown(JNIEnv* env, jclass clazz)
 {
 
     // destroy buffer queue audio player object, and invalidate all associated interfaces
