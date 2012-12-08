@@ -94,27 +94,27 @@ Image::Image(const char *filename, GLfloat _width, GLfloat _height, GLfloat *tex
     if(NULL == file) {
         LOGI("Error opening %s from within zip\n",filename);
         status = FILE_NOT_FOUND;
-        goto exit;
+        goto close_zip;
     }
 
     
     if(8 != zip_fread(file, header, 8)) {
         LOGI("Error reading header for %s\n",filename);
         status = FILE_ERROR;
-        goto close_zip;
+        goto close_zip_file;
     }
 
     if(png_sig_cmp(header, 0, 8)) {
         LOGI("invalid header for %s\n",filename);
         status = FILE_ERROR;
-        goto close_zip;
+        goto close_zip_file;
     }
 
     png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     if (NULL == png_ptr) {
         LOGI("png_ptr error for %s\n",filename);
         status = MEMORY_ERROR;
-        goto close_zip;
+        goto close_zip_file;
     }
 
     info_ptr = png_create_info_struct(png_ptr);
@@ -200,8 +200,10 @@ free_data:
     }
 free_png_ptr:
     png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-close_zip:
+close_zip_file:
     zip_fclose(file);
+close_zip:
+    zip_close(z);
 exit:
     if(status != OK) {
         LOGI("Error status %d processing file %s\n",status,filename);

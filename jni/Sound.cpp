@@ -4,29 +4,63 @@
 #include <sys/stat.h>
 
 void LoadSoundFile(const char *filename,short **buffer,size_t *size) {
-    FILE *data = NULL;
-    struct stat st;
-
-    //LOGI("Loading %s",filename);
-
-    if(0 != stat(filename,&st))
-        throw FILE_NOT_FOUND;
-
-    *buffer = (short int *)malloc(st.st_size);
-    if(NULL == *buffer)
-        throw MEMORY_ERROR;
-
-    data = fopen(filename,"rb");
-    if(NULL == data) 
-        throw FILE_NOT_FOUND;
+    //FILE *data = NULL;
+    struct zip_stat st = {0};
+    zip_file    *file         = NULL;
+    zip         *z            = NULL;
+    char temp_path[1024] = "sounds/";
+    error status = OK;
+    int err;
     
-    if(st.st_size != fread(*buffer,1,st.st_size,data)) {
-        free(*buffer);
-        *buffer = NULL;
-        throw FILE_ERROR;
+    strncat(temp_path,filename,sizeof(temp_path) - strlen(temp_path));
+    
+    z = zip_open(DATA_DIR ZIP_FILENAME, 0, &err);
+    if(NULL == z) {
+        LOGI("Error opening %s\n",DATA_DIR ZIP_FILENAME);
+        status = FILE_NOT_FOUND;
+        goto exit;
     }
 
-    *size = st.st_size;
+    if(zip_stat(z,temp_path,0,&st)) {
+        status = FILE_NOT_FOUND;
+        goto close_zip;
+    }
+
+    *buffer = (short int *)malloc(st.size);
+    if(NULL == *buffer) {
+        status = MEMORY_ERROR;
+        goto close_zip;
+    }
+
+    file = zip_fopen(z, temp_path, 0);
+    if(NULL == file) {
+        LOGI("Error opening %s from within zip\n",temp_path);
+        status = FILE_NOT_FOUND;
+        goto free_data;
+    }
+
+    if(st.size != zip_fread(file, *buffer, st.size)) {
+        LOGI("Error reading header for %s\n",filename);
+        status = FILE_ERROR;
+        goto free_data;
+    }
+
+    *size = st.size;
+
+free_data:
+    if(status != OK and NULL != *buffer) {
+        free(*buffer);
+        *buffer = NULL;
+    }
+close_zip_file:
+    zip_fclose(file);
+close_zip:
+    zip_close(z);
+exit:
+    if(status != OK) {
+        LOGI("Error status %d processing file %s\n",status,temp_path);
+        throw status;
+    }
 }
 
 SoundClip::SoundClip(const char *filename) {

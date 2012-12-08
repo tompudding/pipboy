@@ -88,23 +88,23 @@ JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_in
         icon_unarmed    = new Image("weap_skill_icon_unarmed.png",1.0,1.0,standard_tex_coords);
         icon_sm_arms    = new Image("weap_skill_icon_sm_arms.png",1.0,1.0,standard_tex_coords);
         icon_melee      = new Image("weap_skill_icon_melee.png",1.0,1.0,standard_tex_coords);
-        //arrow           = new Image(DATA_DIR "arrow.dimension_64x64.raw",1.0,1.0,standard_tex_coords);
+        //arrow           = new Image( "arrow.dimension_64x64.raw",1.0,1.0,standard_tex_coords);
     
         try {
-            const char *static_sounds[] = {DATA_DIR "ui_static_c_01.wav.snd",
-                                           DATA_DIR "ui_static_c_02.wav.snd",
-                                           DATA_DIR "ui_static_c_03.wav.snd",
-                                           DATA_DIR "ui_static_c_04.wav.snd",
-                                           DATA_DIR "ui_static_c_05.wav.snd",
-                                           DATA_DIR "ui_static_d_01.wav.snd",
-                                           DATA_DIR "ui_static_d_02.wav.snd",
-                                           DATA_DIR "ui_static_d_03.wav.snd",
-                                           DATA_DIR "ui_static_d_04.wav.snd",
-                                           DATA_DIR "ui_static_d_05.wav.snd",
+            const char *static_sounds[] = { "ui_static_c_01.wav.snd",
+                                            "ui_static_c_02.wav.snd",
+                                            "ui_static_c_03.wav.snd",
+                                            "ui_static_c_04.wav.snd",
+                                            "ui_static_c_05.wav.snd",
+                                            "ui_static_d_01.wav.snd",
+                                            "ui_static_d_02.wav.snd",
+                                            "ui_static_d_03.wav.snd",
+                                            "ui_static_d_04.wav.snd",
+                                            "ui_static_d_05.wav.snd",
                                            NULL};
             //if(NULL == listener)
             //    listener  = new Listener();
-            font      = new Font("monofonto_verylarge02_dialogs2.png",DATA_DIR "monofonto_verylarge02_dialogs2.fnt");
+            font      = new Font("monofonto_verylarge02_dialogs2.png","monofonto_verylarge02_dialogs2.fnt");
             general_text = new Text("balls",font);
             //do 12 random weapons
 
@@ -117,17 +117,17 @@ JNIEXPORT void JNICALL Java_com_google_android_opengles_triangle_NativePipboy_in
             }
         
             viewlist            = new ViewList();
-            mode_change         = new SoundClip(DATA_DIR "mode_change.snd");
-            menu_tab            = new SoundClip(DATA_DIR "menu_tab.snd");
+            mode_change         = new SoundClip( "mode_change.snd");
+            menu_tab            = new SoundClip( "menu_tab.snd");
             mode_change_buzz    = new RandomSoundClip((char **)static_sounds);
-            menu_prevnext       = new SoundClip(DATA_DIR "menu_prevnext.snd");
-            equip_weapon_sound  = new SoundClip(DATA_DIR "equip_weapon.snd");
-            unequip_apparel_sound = new SoundClip(DATA_DIR "unequip_apparel.snd");
-            unequip_weapon_sound  = new SoundClip(DATA_DIR "unequip_weapon.snd");
-            equip_apparel_sound = new SoundClip(DATA_DIR "equip_apparel.snd");
-            equip_aid_sound     = new SoundClip(DATA_DIR "equip_aid.snd");
-            equip_misc_sound    = new SoundClip(DATA_DIR "equip_misc.snd");
-            select_sound        = new SoundClip(DATA_DIR "select_sound.snd");
+            menu_prevnext       = new SoundClip( "menu_prevnext.snd");
+            equip_weapon_sound  = new SoundClip( "equip_weapon.snd");
+            unequip_apparel_sound = new SoundClip( "unequip_apparel.snd");
+            unequip_weapon_sound  = new SoundClip( "unequip_weapon.snd");
+            equip_apparel_sound = new SoundClip( "equip_apparel.snd");
+            equip_aid_sound     = new SoundClip( "equip_aid.snd");
+            equip_misc_sound    = new SoundClip( "equip_misc.snd");
+            select_sound        = new SoundClip( "select_sound.snd");
             general_condition_bar = new ItemConditionBar(0.6);
 
         }

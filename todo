@@ -1,9 +1,10 @@
 done - get working on the S3
-     - move init to a class and prevent the errors on startup
 done - replace raw files
-     - move the sounds to the zip file
+done - move the sounds to the zip file
+     - move init to a class and prevent the errors on startup  
+     - loading screen / error messages
      - move configuration to a text file
      - fix the lifecycle stuff, which may be related to the next thing
      - fix the weird occasional black screen issue
-     - loading screen / error messages
+     - replace the .snd files with compressed mp3s or such
      - lots more

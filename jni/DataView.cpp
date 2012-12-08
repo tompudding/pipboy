@@ -167,14 +167,12 @@ void DataView::Select() {
 
 
 RadioItem::RadioItem(const ItemData *data,Font *font) : Item(data,font),box(0.5,0.08,0.007){
-    char temp_path[1024] = DATA_DIR;
     name = strdup(data->name);
     code = data->code;
     type = data->type;
-    
-    strncat(temp_path,data->filename,sizeof(temp_path)-strlen(temp_path));
-    LOGI("Trying to open radio sound %s",temp_path);
-    clip = new SoundClip(temp_path);
+
+    LOGI("Trying to open radio sound %s",data->filename);
+    clip = new SoundClip(data->filename);
     text = new Text(name,font);
 }
 

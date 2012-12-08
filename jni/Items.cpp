@@ -50,7 +50,7 @@ Item::Item(const ItemData *data,Font *font){
     type = data->type;
     
     if(data->type != RADIO) {
-        strncat(temp_path,data->filename,sizeof(temp_path));
+        strncat(temp_path,data->filename,sizeof(temp_path) - strlen(temp_path));
         LOGI("Trying to open %s",temp_path);
         icon = new Image(temp_path,1.0*480/800,1.0,standard_tex_coords);
     }

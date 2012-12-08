@@ -6,63 +6,91 @@ void Text::Draw (GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
     font->Write(text,x,y,xscale);
 }
 
+#define FONT_OFFSET 296
+#define FONT_CHUNK_NUM 256
+#define FONT_CHUNK_SIZE 14
+
 Font::Font(const char *tex_filename,const char *fnt_filename) {
-    FILE *fnt_f;
-    int i;
+    FILE     *fnt_f;
+    zip_file *file        = NULL;
+    zip      *z           = NULL;
+    int       i;
+    int       err;
+    error     status      = OK;
+    GLfloat tex_coords[8] = {0};
 
     texture = new Image(tex_filename,1,1,standard_tex_coords);
 
-    fnt_f = fopen(fnt_filename,"rb");
-    try {
-        GLfloat tex_coords[8] = {0};
-        if(NULL == fnt_f) {
-            LOGI("%d",__LINE__);
-            throw FILE_NOT_FOUND;
+    z = zip_open(DATA_DIR ZIP_FILENAME, 0, &err);
+    if(NULL == z) {
+        LOGI("Error opening %s\n",DATA_DIR ZIP_FILENAME);
+        status = FILE_NOT_FOUND;
+        goto delete_texture;
+    }
+
+    file = zip_fopen(z, fnt_filename, 0);
+    if(NULL == file) {
+        LOGI("Error opening %s from within zip\n",fnt_filename);
+        status = FILE_NOT_FOUND;
+        goto close_zip;
+    }
+
+    //There doesn't appear to be a zip_fseek function...
+    for(i=0;i<FONT_OFFSET;i++) {
+        if(1 != zip_fread(file,&err,1)) {
+            LOGI("Error reading byte %d from font header\n",i);
+            status = FILE_ERROR;
+            goto close_zip_file;
         }
+    }
         
-        if(0 != fseek(fnt_f,296,SEEK_SET)) 
-            throw FILE_ERROR;
-        
-        for(i = 0; i < 256; i++) {
-            GLfloat floats[14];
-            if(14 != fread(&floats,4,14,fnt_f))
-                throw FILE_ERROR;
+    for(i = 0; i < FONT_CHUNK_NUM; i++) {
+        GLfloat floats[FONT_CHUNK_SIZE];
+        if((sizeof(float)*FONT_CHUNK_SIZE) != zip_fread(file,&floats,sizeof(float)*FONT_CHUNK_SIZE)) {
+            LOGI("Error reading chunk %d from font header\n",i);
+            status = FILE_ERROR;
+            goto close_zip_file;
+        }
             
-            if(floats[1] == floats[3] && floats[2] == floats[4])
-                continue;
+        if(floats[1] == floats[3] && floats[2] == floats[4])
+            continue;
 
-            tex_coords[0] = floats[5]/2.0;
-            tex_coords[1] = floats[6]/2.0;
-            tex_coords[2] = floats[1]/2.0;
-            tex_coords[3] = floats[2]/2.0;
-            tex_coords[4] = floats[3]/2.0;
-            tex_coords[5] = floats[4]/2.0;
-            tex_coords[6] = floats[7]/2.0;
-            tex_coords[7] = floats[8]/2.0;
+        tex_coords[0] = floats[5]/2.0;
+        tex_coords[1] = floats[6]/2.0;
+        tex_coords[2] = floats[1]/2.0;
+        tex_coords[3] = floats[2]/2.0;
+        tex_coords[4] = floats[3]/2.0;
+        tex_coords[5] = floats[4]/2.0;
+        tex_coords[6] = floats[7]/2.0;
+        tex_coords[7] = floats[8]/2.0;
 
-            GLfloat width  = (tex_coords[4]-tex_coords[2])*480/800;
-            GLfloat height = (tex_coords[1]-tex_coords[3]);
+        GLfloat width  = (tex_coords[4]-tex_coords[2])*480/800;
+        GLfloat height = (tex_coords[1]-tex_coords[3]);
 
-            //LOGI("letter %c : %.2f %.2f",(char)i,width*100,height*100);
-            //LOGI("%d [%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f]",i,floats[0],floats[1],floats[2],floats[3],floats[4],floats[5],
-            //     floats[6],floats[7],floats[8],floats[9],floats[10],floats[11],floats[12],floats[13]);
+        LOGI("letter %c : %.2f %.2f",(char)i,width*100,height*100);
+        LOGI("%d [%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f]",i,floats[0],floats[1],floats[2],floats[3],floats[4],floats[5],
+             floats[6],floats[7],floats[8],floats[9],floats[10],floats[11],floats[12],floats[13]);
 
-            //LOGI("Image tex coords %c : (%.2f,%.2f),(%.2f,%.2f),(%.2f,%.2f),(%.2f,%.2f)",i,tex_coords[0],tex_coords[1],tex_coords[2],tex_coords[3],tex_coords[4],tex_coords[5],tex_coords[6],tex_coords[7]);
-            //LOGI("Image dimensions %c : (%.2f,%.2f)",i,width,height);
+        //LOGI("Image tex coords %c : (%.2f,%.2f),(%.2f,%.2f),(%.2f,%.2f),(%.2f,%.2f)",i,tex_coords[0],tex_coords[1],tex_coords[2],tex_coords[3],tex_coords[4],tex_coords[5],tex_coords[6],tex_coords[7]);
+        //LOGI("Image dimensions %c : (%.2f,%.2f)",i,width,height);
 
-            letters[(char)i] = new ImagePtr(texture,width,height,tex_coords);
-            offsets[(char)i] = (floats[10]-floats[13])/700.0; //why 700? no clue.
-        }
-        fclose(fnt_f);
+        letters[(char)i] = new ImagePtr(texture,width,height,tex_coords);
+        offsets[(char)i] = (floats[10]-floats[13])/700.0; //why 700? no clue.
     }
-    catch(error e) {
-        LOGI("%d",__LINE__);
-        if(NULL != fnt_f) {
-            fclose(fnt_f);
-        }
-        throw e;
+close_zip_file:
+    zip_fclose(file);
+close_zip:
+    zip_close(z);
+delete_texture:
+    if(status != OK && NULL != texture) {
+        delete texture;
+        texture = NULL;
     }
-        
+exit:
+    if(status != OK) {
+        LOGI("Error status %d processing font file %s\n",status,fnt_filename);
+        throw status;
+    } 
 }
 
 void Font::Write(const char *string,GLfloat x, GLfloat y, GLfloat size) {
