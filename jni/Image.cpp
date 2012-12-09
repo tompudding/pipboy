@@ -227,7 +227,7 @@ void Image::Load() {
     //read the png into image_data through row_pointers
     png_read_image(png_ptr, row_pointers);
     loaded = true;
-    RefreshTexture();
+    //RefreshTexture();
 
     memcpy(mFVertexBuffer,coords,sizeof(mFVertexBuffer));
     memcpy(mIndexBuffer,indicies,sizeof(mIndexBuffer));
@@ -293,7 +293,7 @@ void LoadImages(JNIEnv *env, jobject callbackClass, jmethodID progress_method, s
             (*i)->Load();
             if(progress_method) {                    
                 (*loaded) += (*i)->Size();                                            
-                env->CallFloatMethod(callbackClass,progress_method,((float)(*loaded))/total_items); 
+                env->CallVoidMethod(callbackClass,progress_method,((float)(*loaded))/total_items); 
             }
         }
     }

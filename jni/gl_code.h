@@ -45,8 +45,8 @@ extern "C" {
  * Method:    init
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init
-(JNIEnv *, jclass, jobject callbackClass);
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load (JNIEnv *, jclass, jobject callbackClass);
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init (JNIEnv *, jclass);
 
 /*
  * Class:     com_tompudding_pipboy_NativePipboy

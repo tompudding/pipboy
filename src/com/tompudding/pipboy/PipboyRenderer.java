@@ -41,6 +41,7 @@ public class PipboyRenderer implements GLView.Renderer{
     public PipboyRenderer(Context context,Progress cb) {
         mContext = context;
         progressCallback = cb;
+        NativePipboy.load(progressCallback);
         //mGlare = new Triangle(1.0f,1.0f,1.0f,1.0f);
         //mBand = new Triangle(1.0f,0.27f,4.0f,1.0f);
     }
@@ -57,7 +58,7 @@ public class PipboyRenderer implements GLView.Renderer{
     }
 
     public void surfaceCreated(GL10 gl) {
-        NativePipboy.init(progressCallback);
+        NativePipboy.init();
     }
 
     public void drawFrame(GL10 gl) {

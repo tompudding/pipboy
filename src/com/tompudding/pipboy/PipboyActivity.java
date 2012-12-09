@@ -37,6 +37,8 @@ import android.view.GestureDetector;
 import android.util.Log;
 import android.content.DialogInterface;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.os.Handler;
 
 class MyGestureDetector extends SimpleOnGestureListener implements OnClickListener{
     public float x;
@@ -102,9 +104,14 @@ class Progress implements ProgressCallback {
     }
     public void updateProgress(float progress)  {
         Log.i("nativepipboy",String.format("progress update %f",progress));
+        root.progressBar.setProgress((int)(progress*100));
+        if(progress >= 1.0) {
+            root.progressBar.dismiss();
+            root.setRenderer();
+        }
     }
-    public void fatalError(String error) {
-        Log.i("nativepipboy","Fatal error : " + error);
+    public void fatalError(String message) {
+        Log.i("nativepipboy","Fatal error : " + message);
         root.finish();
     }
 }
@@ -118,7 +125,27 @@ public class PipboyActivity extends Activity implements OnClickListener{
     private final static boolean DEBUG_CHECK_GL_ERROR = true;
     private GestureDetector gestureDetector;
     private final MyGestureDetector mgd = new MyGestureDetector(0,0);
+    private Handler mHandler = new Handler();
     Progress jim = new Progress(this);
+    ProgressDialog progressBar;
+    PipboyRenderer bob;
+
+    public void createbob() {
+        bob = new PipboyRenderer(this,jim);
+    }
+
+    public void setRenderer() {
+        while(null == bob) {
+            try {
+                Thread.sleep(200);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        mGLView.setRenderer(bob);
+        mGLView.requestFocus();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,7 +167,7 @@ public class PipboyActivity extends Activity implements OnClickListener{
                 }
                 return false;
             }
-        });
+            });
         /*
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle("jim");
@@ -152,12 +179,25 @@ public class PipboyActivity extends Activity implements OnClickListener{
         });
         alertDialog.show();*/
 
+        progressBar = new ProgressDialog(this);
+        progressBar.setCancelable(false);
+        progressBar.setMessage("Loading");
+        progressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressBar.setProgress(0);
+        progressBar.setMax(100);
+        progressBar.show();
+        NativePipboy.createEngine();
+        NativePipboy.createBufferQueueAudioPlayer();
+        new Thread(new Runnable() {
+            public void run() {
+                createbob();
+            }
+        }).start();
+
         mGLView.setOnClickListener(PipboyActivity.this); 
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        NativePipboy.createEngine();
-        NativePipboy.createBufferQueueAudioPlayer();
 
         if (DEBUG_CHECK_GL_ERROR) {
             mGLView.setGLWrapper(new GLView.GLWrapper() {
@@ -165,8 +205,6 @@ public class PipboyActivity extends Activity implements OnClickListener{
                     return GLDebugHelper.wrap(gl, GLDebugHelper.CONFIG_CHECK_GL_ERROR, null);
                 }});
         }
-        mGLView.setRenderer(new PipboyRenderer(this,jim));
-        mGLView.requestFocus();
         
     }
 

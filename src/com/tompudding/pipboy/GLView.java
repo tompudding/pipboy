@@ -45,6 +45,7 @@ import javax.microedition.khronos.opengles.GL10;
  * instance.
  */
 class GLView extends SurfaceView implements SurfaceHolder.Callback {
+    boolean needsrefresh = false;
     GLView(Context context) {
         super(context);
         init();
@@ -70,21 +71,33 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
     public void setRenderer(Renderer renderer) {
         mGLThread = new GLThread(renderer);
         mGLThread.start();
+        if(needsrefresh) {
+            mGLThread.surfaceCreated();
+        }
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-        mGLThread.surfaceCreated();
+        if(null != mGLThread) {
+            mGLThread.surfaceCreated();
+        }
+        else {
+            needsrefresh = true;
+        }
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
         // Surface will be destroyed when we return
-        mGLThread.surfaceDestroyed();
+        if(null != mGLThread) {
+            mGLThread.surfaceDestroyed();
+        }
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         // Surface size or format has changed. This should not happen in this
         // example.
-        mGLThread.onWindowResize(w, h);
+        if(null != mGLThread) {
+            mGLThread.onWindowResize(w, h);
+        }
     }
 
     /**
@@ -92,7 +105,9 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
      */
     public void onPause() {
         Log.i("nativepipboy","glview::onpause");
-        mGLThread.onPause();
+        if(null != mGLThread) {
+            mGLThread.onPause();
+        }
     }
 
     /**
@@ -100,7 +115,9 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
      */
     public void onResume() {
         Log.i("nativepipboy","glview::onresume");
-        mGLThread.onResume();
+        if(null != mGLThread) {
+            mGLThread.onResume();
+        }
     }
 
     /**
@@ -108,7 +125,9 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
      */
     @Override public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        mGLThread.onWindowFocusChanged(hasFocus);
+        if(null != mGLThread) {
+            mGLThread.onWindowFocusChanged(hasFocus);
+        }
     }
 
     /**
@@ -116,14 +135,18 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
      * @param r the runnable to be run on the GL rendering thread.
      */
     public void queueEvent(Runnable r) {
-        mGLThread.queueEvent(r);
+        if(null != mGLThread) {
+            mGLThread.queueEvent(r);
+        }
     }
 
     @Override
     protected void onDetachedFromWindow() {
         Log.i("nativepipboy","ondetachedfromwindow");
         super.onDetachedFromWindow();
-        mGLThread.requestExitAndWait();
+        if(null != mGLThread) {
+            mGLThread.requestExitAndWait();
+        }
     }
 
     // ----------------------------------------------------------------------

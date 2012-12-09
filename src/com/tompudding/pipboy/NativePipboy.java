@@ -27,7 +27,8 @@ public class NativePipboy {
      * @param width the current view width
      * @param height the current view height
      */
-    public static native void init(ProgressCallback pb);
+    public static native void init();
+    public static native void load(ProgressCallback pb);
     public static native void refresh();
     public static native void step();
     public static native void createEngine();

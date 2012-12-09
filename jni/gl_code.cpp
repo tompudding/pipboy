@@ -47,7 +47,7 @@ void checkGlError(int op) {
     }
 }
 
-JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init  (JNIEnv *env, jclass bob, jobject callbackClass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load  (JNIEnv *env, jclass bob, jobject callbackClass) {
     GLfloat tex_coords[] = {0,1.0,
                             0,0,
                             4.0,0.0,
@@ -56,22 +56,7 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init  (JNIEnv *en
                                  0,0.0,
                                  256.0,0.0,
                                  256.0,24.0};
-    uint32_t white = 0xffffffff;
-    uint32_t grey = 0x808080ff;
-    LOGI("init monkey");
-    srand48(time(NULL));
-    sleep(1);
-    glEnable(GL_BLEND);checkGlError(__LINE__);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);checkGlError(__LINE__);
-    glEnable(GL_TEXTURE_2D);checkGlError(__LINE__);
-    glEnableClientState(GL_VERTEX_ARRAY);checkGlError(__LINE__);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);checkGlError(__LINE__);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);checkGlError(__LINE__);
-    glDisable(GL_DEPTH_TEST);checkGlError(__LINE__);
-    glColor4f(0.54f, 0.43f, 0.19f,1.0f);
-    //glColor4f(0.54f,0.855f,0.58f,1.0f);
-
-    jclass cls = env->FindClass("com.tompudding.pipboy.ProgressCallback");
+    jclass cls = env->FindClass("com/tompudding/pipboy/ProgressCallback");
     jmethodID progress_method = NULL;
     jmethodID error_method = NULL;
     if(NULL == cls) {
@@ -88,78 +73,93 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init  (JNIEnv *en
         //}
     }
 
+    size_t total_items = 30 + numitems; 
+    size_t loaded = 0;
+    initialised = 1;
+    glare           = new Image("screenglare_alpha.png",0.8,1.0,standard_tex_coords);
+    fade            = new Image("fade.png",1.0,1.0,standard_tex_coords);
+    band            = new Image("band.png",0.8,0.5,tex_coords);
+    scanlines       = new Image("scanline.png",0.8,1.0,scanline_coords);
+    icon_explosives = new Image("weap_skill_icon_explosives.png",1.0,1.0,standard_tex_coords);
+    icon_energy     = new Image("weap_skill_icon_energy.png",1.0,1.0,standard_tex_coords);
+    icon_bigguns    = new Image("weap_skill_icon_big_guns.png",1.0,1.0,standard_tex_coords);
+    icon_unarmed    = new Image("weap_skill_icon_unarmed.png",1.0,1.0,standard_tex_coords);
+    icon_sm_arms    = new Image("weap_skill_icon_sm_arms.png",1.0,1.0,standard_tex_coords);
+    icon_melee      = new Image("weap_skill_icon_melee.png",1.0,1.0,standard_tex_coords);
+    //arrow           = new Image( "arrow.dimension_64x64.raw",1.0,1.0,standard_tex_coords);
+    
+    try {
+        const char *static_sounds[] = { "ui_static_c_01.wav.snd",
+                                        "ui_static_c_02.wav.snd",
+                                        "ui_static_c_03.wav.snd",
+                                        "ui_static_c_04.wav.snd",
+                                        "ui_static_c_05.wav.snd",
+                                        "ui_static_d_01.wav.snd",
+                                        "ui_static_d_02.wav.snd",
+                                        "ui_static_d_03.wav.snd",
+                                        "ui_static_d_04.wav.snd",
+                                        "ui_static_d_05.wav.snd",
+                                        NULL};
+        //if(NULL == listener)
+        //    listener  = new Listener();
+        font      = new Font("monofonto_verylarge02_dialogs2.png","monofonto_verylarge02_dialogs2.fnt");
+        general_text = new Text("balls",font);
+        //do 12 random weapons
+
+        //memory_leak!
+        item_map.clear();
+        for(int i=0;i<numitems;i++){
+            //Item *x = new Item(itemdata+i,font);
+            //LOGI("Adding item %d(%p) to %d : %d,%d",i,x,itemdata[i].code,numweap,numapp);
+            item_map[itemdata[i].code] = &(itemdata[i]);
+        }
+        
+        viewlist              = new ViewList();
+        mode_change           = new SoundClip( "mode_change.snd");
+        menu_tab              = new SoundClip( "menu_tab.snd");
+        mode_change_buzz      = new RandomSoundClip((char **)static_sounds);
+        menu_prevnext         = new SoundClip( "menu_prevnext.snd");
+        equip_weapon_sound    = new SoundClip( "equip_weapon.snd");
+        unequip_apparel_sound = new SoundClip( "unequip_apparel.snd");
+        unequip_weapon_sound  = new SoundClip( "unequip_weapon.snd");
+        equip_apparel_sound   = new SoundClip( "equip_apparel.snd");
+        equip_aid_sound       = new SoundClip( "equip_aid.snd");
+        equip_misc_sound      = new SoundClip( "equip_misc.snd");
+        select_sound          = new SoundClip( "select_sound.snd");
+        general_condition_bar = new ItemConditionBar(0.6);
+
+        total_items = NumImages() + NumSounds();
+        loaded = 0;
+
+        LoadImages(env,callbackClass,progress_method,&loaded,total_items);
+        LoadSounds(env,callbackClass,progress_method,&loaded,total_items);
+    }
+    catch(error e) {
+        LOGI("Error creating  %d",e);
+        font = NULL;
+    }
+
+}
+
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init  (JNIEnv *env, jclass bob) {
+    uint32_t white = 0xffffffff;
+    uint32_t grey = 0x808080ff;
+    LOGI("init monkey");
+    srand48(time(NULL));
+    sleep(1);
+    glEnable(GL_BLEND);checkGlError(__LINE__);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);checkGlError(__LINE__);
+    glEnable(GL_TEXTURE_2D);checkGlError(__LINE__);
+    glEnableClientState(GL_VERTEX_ARRAY);checkGlError(__LINE__);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);checkGlError(__LINE__);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);checkGlError(__LINE__);
+    glDisable(GL_DEPTH_TEST);checkGlError(__LINE__);
+    glColor4f(0.54f, 0.43f, 0.19f,1.0f);
+    //glColor4f(0.54f,0.855f,0.58f,1.0f);
+
     white_texture = GenTexture(1,1,(uint8_t*)&white);
     grey_texture = GenTexture(1,1,(uint8_t*)&grey);
-    if(initialised) {
-        RefreshImages();
-    }
-    else {
-        size_t total_items = 30 + numitems; 
-        size_t loaded = 0;
-        initialised = 1;
-        glare           = new Image("screenglare_alpha.png",0.8,1.0,standard_tex_coords);
-        fade            = new Image("fade.png",1.0,1.0,standard_tex_coords);
-        band            = new Image("band.png",0.8,0.5,tex_coords);
-        scanlines       = new Image("scanline.png",0.8,1.0,scanline_coords);
-        icon_explosives = new Image("weap_skill_icon_explosives.png",1.0,1.0,standard_tex_coords);
-        icon_energy     = new Image("weap_skill_icon_energy.png",1.0,1.0,standard_tex_coords);
-        icon_bigguns    = new Image("weap_skill_icon_big_guns.png",1.0,1.0,standard_tex_coords);
-        icon_unarmed    = new Image("weap_skill_icon_unarmed.png",1.0,1.0,standard_tex_coords);
-        icon_sm_arms    = new Image("weap_skill_icon_sm_arms.png",1.0,1.0,standard_tex_coords);
-        icon_melee      = new Image("weap_skill_icon_melee.png",1.0,1.0,standard_tex_coords);
-        //arrow           = new Image( "arrow.dimension_64x64.raw",1.0,1.0,standard_tex_coords);
-    
-        try {
-            const char *static_sounds[] = { "ui_static_c_01.wav.snd",
-                                            "ui_static_c_02.wav.snd",
-                                            "ui_static_c_03.wav.snd",
-                                            "ui_static_c_04.wav.snd",
-                                            "ui_static_c_05.wav.snd",
-                                            "ui_static_d_01.wav.snd",
-                                            "ui_static_d_02.wav.snd",
-                                            "ui_static_d_03.wav.snd",
-                                            "ui_static_d_04.wav.snd",
-                                            "ui_static_d_05.wav.snd",
-                                           NULL};
-            //if(NULL == listener)
-            //    listener  = new Listener();
-            font      = new Font("monofonto_verylarge02_dialogs2.png","monofonto_verylarge02_dialogs2.fnt");
-            general_text = new Text("balls",font);
-            //do 12 random weapons
-
-            //memory_leak!
-            item_map.clear();
-            for(int i=0;i<numitems;i++){
-                //Item *x = new Item(itemdata+i,font);
-                //LOGI("Adding item %d(%p) to %d : %d,%d",i,x,itemdata[i].code,numweap,numapp);
-                item_map[itemdata[i].code] = &(itemdata[i]);
-            }
-        
-            viewlist              = new ViewList();
-            mode_change           = new SoundClip( "mode_change.snd");
-            menu_tab              = new SoundClip( "menu_tab.snd");
-            mode_change_buzz      = new RandomSoundClip((char **)static_sounds);
-            menu_prevnext         = new SoundClip( "menu_prevnext.snd");
-            equip_weapon_sound    = new SoundClip( "equip_weapon.snd");
-            unequip_apparel_sound = new SoundClip( "unequip_apparel.snd");
-            unequip_weapon_sound  = new SoundClip( "unequip_weapon.snd");
-            equip_apparel_sound   = new SoundClip( "equip_apparel.snd");
-            equip_aid_sound       = new SoundClip( "equip_aid.snd");
-            equip_misc_sound      = new SoundClip( "equip_misc.snd");
-            select_sound          = new SoundClip( "select_sound.snd");
-            general_condition_bar = new ItemConditionBar(0.6);
-
-            total_items = NumImages() + NumSounds();
-            loaded = 0;
-
-            LoadImages(env,callbackClass,progress_method,&loaded,total_items);
-            LoadSounds(env,callbackClass,progress_method,&loaded,total_items);
-        }
-        catch(error e) {
-            LOGI("Error creating  %d",e);
-            font = NULL;
-        }
-    }
+    RefreshImages();
     
     LOGI("init monkey: %p %p",glare,viewlist);
 }

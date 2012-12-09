@@ -235,7 +235,7 @@ void LoadSounds(JNIEnv *env, jobject callbackClass, jmethodID progress_method, s
             (*i)->Load();
             if(progress_method) {                    
                 (*loaded) += (*i)->Size();                                            
-                env->CallFloatMethod(callbackClass,progress_method,((float)(*loaded))/total_items); 
+                env->CallVoidMethod(callbackClass,progress_method,((float)(*loaded))/total_items); 
             }
         }
     }
