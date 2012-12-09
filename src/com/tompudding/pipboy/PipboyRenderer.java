@@ -36,8 +36,11 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class PipboyRenderer implements GLView.Renderer{
 
-    public PipboyRenderer(Context context) {
+    ProgressCallback progressCallback;
+
+    public PipboyRenderer(Context context,Progress cb) {
         mContext = context;
+        progressCallback = cb;
         //mGlare = new Triangle(1.0f,1.0f,1.0f,1.0f);
         //mBand = new Triangle(1.0f,0.27f,4.0f,1.0f);
     }
@@ -54,7 +57,7 @@ public class PipboyRenderer implements GLView.Renderer{
     }
 
     public void surfaceCreated(GL10 gl) {
-        NativePipboy.init();
+        NativePipboy.init(progressCallback);
     }
 
     public void drawFrame(GL10 gl) {

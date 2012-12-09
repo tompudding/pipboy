@@ -35,6 +35,8 @@ import android.view.WindowManager;
 import android.content.Context;
 import android.view.GestureDetector;
 import android.util.Log;
+import android.content.DialogInterface;
+import android.app.AlertDialog;
 
 class MyGestureDetector extends SimpleOnGestureListener implements OnClickListener{
     public float x;
@@ -88,6 +90,25 @@ class MyGestureDetector extends SimpleOnGestureListener implements OnClickListen
 
 }
 
+interface ProgressCallback {
+    void updateProgress(float progress);
+    void fatalError(String message);
+}
+
+class Progress implements ProgressCallback {
+    PipboyActivity root;
+    public Progress(PipboyActivity r) {
+        root = r;
+    }
+    public void updateProgress(float progress)  {
+        Log.i("nativepipboy",String.format("progress update %f",progress));
+    }
+    public void fatalError(String error) {
+        Log.i("nativepipboy","Fatal error : " + error);
+        root.finish();
+    }
+}
+
 public class PipboyActivity extends Activity implements OnClickListener{
 
     /** Set to true to enable checking of the OpenGL error code after every OpenGL call. Set to
@@ -97,6 +118,7 @@ public class PipboyActivity extends Activity implements OnClickListener{
     private final static boolean DEBUG_CHECK_GL_ERROR = true;
     private GestureDetector gestureDetector;
     private final MyGestureDetector mgd = new MyGestureDetector(0,0);
+    Progress jim = new Progress(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,8 +141,18 @@ public class PipboyActivity extends Activity implements OnClickListener{
                 return false;
             }
         });
-        mGLView.setOnClickListener(PipboyActivity.this); 
+        /*
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("jim");
+        alertDialog.setMessage("bob");
+        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        alertDialog.show();*/
 
+        mGLView.setOnClickListener(PipboyActivity.this); 
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
@@ -133,7 +165,7 @@ public class PipboyActivity extends Activity implements OnClickListener{
                     return GLDebugHelper.wrap(gl, GLDebugHelper.CONFIG_CHECK_GL_ERROR, null);
                 }});
         }
-        mGLView.setRenderer(new PipboyRenderer(this));
+        mGLView.setRenderer(new PipboyRenderer(this,jim));
         mGLView.requestFocus();
         
     }

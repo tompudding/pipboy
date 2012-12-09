@@ -46,7 +46,7 @@ extern "C" {
  * Signature: ()V
  */
 JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init
-  (JNIEnv *, jclass);
+(JNIEnv *, jclass, jobject callbackClass);
 
 /*
  * Class:     com_tompudding_pipboy_NativePipboy
@@ -83,6 +83,7 @@ enum error {
     LISTEN_ERROR,
     SOCKET_ERROR,
     THREAD_ERROR,
+    UNINITIALISED,
     MEMORY_ERROR
 };
 
@@ -123,9 +124,13 @@ public:
     ~SoundClip();
 
     virtual void GetBuffer(short **output,size_t *size);
+    virtual void Load();
+    virtual size_t Size();
 
     short *buffer;
     size_t size;
+    char *fname;
+    bool loaded;
 };
 
 class RandomSoundClip : public SoundClip{
@@ -134,10 +139,14 @@ public:
     ~RandomSoundClip();
 
     virtual void GetBuffer(short **output,size_t *size);
+    virtual void Load();
+    virtual size_t Size();
 
     short **buffer;
+    char **filenames;
     size_t *size;
     size_t count;
+    size_t total_size;
 };
 
 extern struct timeval tv;
@@ -155,6 +164,8 @@ public:
 
     void    Draw(GLfloat x,GLfloat y,GLfloat xscale=1.0, GLfloat yscale=1.0);
     void RefreshTexture();
+    void Load();
+    size_t Size();
 
     GLuint  texture;
     GLfloat mFVertexBuffer[4*3];
@@ -164,6 +175,8 @@ public:
     uint8_t *data;
     uint32_t file_width;
     uint32_t file_height;
+    size_t size;
+    bool loaded;
     char *fname;
 };
 
@@ -180,6 +193,10 @@ public:
 };
 
 void RefreshImages(void);
+void LoadImages(JNIEnv *env, jobject callbackClass, jmethodID progress_method, size_t *loaded, size_t total_items);
+void LoadSounds(JNIEnv *env, jobject callbackClass, jmethodID progress_method, size_t *loaded, size_t total_items);
+size_t NumImages();
+size_t NumSounds();
 
 class Box : public Drawable {
 public:
@@ -715,6 +732,7 @@ public:
     void RightInView();
     void Select();
     void SwitchView(uint32_t view,uint32_t rotary,float pos);
+    size_t NumLoadable();
 
     pthread_mutex_t viewlist_mutex;
     viewlist_t viewlist;
@@ -770,6 +788,7 @@ extern GLfloat standard_tex_coords[];
 extern ItemData itemdata[];
 extern size_t numitems;
 extern itemmap_t item_map;
+
 
 #define DATA_DIR "/storage/sdcard1/pipboy/"
 #define ZIP_FILENAME "data.zip"

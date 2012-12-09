@@ -3,6 +3,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+std::list<SoundClip*> sound_list;
+
 void LoadSoundFile(const char *filename,short **buffer,size_t *size) {
     //FILE *data = NULL;
     struct zip_stat st = {0};
@@ -63,13 +65,55 @@ exit:
     }
 }
 
+size_t GetSizeSound(const char *filename) {
+    int              err = 0;
+    struct zip_stat  st  = {0};
+    zip             *z   = NULL;
+    size_t           out = 0;
+    char temp_path[1024] = "sounds/";
+
+    strncat(temp_path,filename,sizeof(temp_path) - strlen(temp_path));
+
+    //Get the size of the file for helping make the loading bar more accurate.
+    z = zip_open(DATA_DIR ZIP_FILENAME, 0, &err);
+    if(NULL == z) {
+        LOGI("Error opening %s for size computation\n",DATA_DIR ZIP_FILENAME);
+        goto exit;
+    }
+    if(zip_stat(z,temp_path,0,&st)) {
+        goto close_zip;
+    }
+    out = st.size;
+    LOGI("Got size %u for sound %s",out,filename);
+close_zip:
+    zip_close(z);
+exit:
+    return out;
+}
+
 SoundClip::SoundClip(const char *filename) {
-    LoadSoundFile(filename,&buffer,&size);
+    fname = strdup(filename);
+    loaded = false;
+    size = GetSizeSound(filename);
+
+    sound_list.push_back(this); //can I do this?
+}
+
+void SoundClip::Load() {
+    LoadSoundFile(fname,&buffer,&size);
+    loaded = true;
+}
+
+size_t SoundClip::Size() {
+    return size;
 }
 
 SoundClip::~SoundClip() {
     if(NULL != buffer) 
         free(buffer);
+    if(NULL != fname) {
+        free(fname);
+    }
 }
 
 void SoundClip::GetBuffer(short **out,size_t *outs) {
@@ -81,13 +125,31 @@ RandomSoundClip::RandomSoundClip(char **filename) {
     buffer = NULL;
     size   = NULL;
     count = 0;
-    try {
-        if(NULL == filename)
-            throw MEMORY_ERROR;
-        //count how many we want
-        for(char **p = filename; *p; p++)
-            count ++;
+    loaded = false;
+    total_size = 0;
+    int i = 0;
+    //make a copy of the filenames for later loading
+    for(char **p = filename; *p; p++)
+        count++;
+    filenames = (char**)malloc(sizeof(char*)*count);
+    if(NULL == filenames) {
+        throw MEMORY_ERROR;
+    }
+    for(char **p = filename; *p; p++,i++) {
+        filenames[i] = strdup(*p);
+        total_size  += GetSizeSound(*p);
+    }
 
+    sound_list.push_back(this); //can I do this?
+}
+
+size_t RandomSoundClip::Size() {
+    return total_size;
+}
+
+
+void RandomSoundClip::Load() {
+    try {
         LOGI("Got %u rs filenames",count);
 
         if(count > 256)
@@ -103,8 +165,10 @@ RandomSoundClip::RandomSoundClip(char **filename) {
             throw MEMORY_ERROR;
         memset(size,0,sizeof(size_t)*count);
         int i = 0;
-        for(char **p = filename; *p; p++,i++) 
-            LoadSoundFile(*p,&(buffer[i]),&(size[i]));
+        for(i=0;i<count;i++) {
+            LoadSoundFile(filenames[i],&(buffer[i]),&(size[i]));
+        }
+        loaded = true;
     }
     catch (error e) {
         if(NULL != buffer) {
@@ -144,6 +208,11 @@ RandomSoundClip::~RandomSoundClip() {
 
 void RandomSoundClip::GetBuffer(short **outbuffer, size_t *outsize) {
     unsigned long val = lrand48();
+
+    if(!loaded) {
+        throw UNINITIALISED;
+    }
+
     val = val%count;
     //LOGI("Choosing item %d",val);
     
@@ -157,4 +226,27 @@ void PlayClip(SoundClip &sc,int queue,int q) {
     sc.GetBuffer(&buffer,&size);
     if(NULL != buffer)
         PlayClip_c(buffer,size,queue,q);
+}
+
+void LoadSounds(JNIEnv *env, jobject callbackClass, jmethodID progress_method, size_t *loaded, size_t total_items) {
+    LOGI("Loadimages with %d sounds\n",sound_list.size());
+    for(std::list<SoundClip*>::iterator i = sound_list.begin(); i != sound_list.end(); i++) {
+        if(*i != NULL) {
+            (*i)->Load();
+            if(progress_method) {                    
+                (*loaded) += (*i)->Size();                                            
+                env->CallFloatMethod(callbackClass,progress_method,((float)(*loaded))/total_items); 
+            }
+        }
+    }
+}
+
+size_t NumSounds() {
+    size_t num = 0;
+    for(std::list<SoundClip*>::iterator i = sound_list.begin(); i != sound_list.end(); i++) {
+        if(*i != NULL) {
+            num += (*i)->Size();
+        }
+    }
+    return num;
 }
