@@ -107,7 +107,6 @@ class Progress implements ProgressCallback {
         root.progressBar.setProgress((int)(progress*100));
         if(progress >= 1.0) {
             root.progressBar.dismiss();
-            root.setRenderer();
         }
     }
     public void fatalError(String message) {
@@ -131,18 +130,9 @@ public class PipboyActivity extends Activity implements OnClickListener{
     PipboyRenderer bob;
 
     public void createbob() {
+        Log.i("nativepipboy",String.format("creating bob"));
         bob = new PipboyRenderer(this,jim);
-    }
-
-    public void setRenderer() {
-        while(null == bob) {
-            try {
-                Thread.sleep(200);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        Log.i("nativepipboy",String.format("created bob"));
         mGLView.setRenderer(bob);
         mGLView.requestFocus();
     }

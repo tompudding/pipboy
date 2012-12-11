@@ -71,17 +71,15 @@ class GLView extends SurfaceView implements SurfaceHolder.Callback {
     public void setRenderer(Renderer renderer) {
         mGLThread = new GLThread(renderer);
         mGLThread.start();
-        if(needsrefresh) {
-            mGLThread.surfaceCreated();
-        }
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
         if(null != mGLThread) {
             mGLThread.surfaceCreated();
+            Log.i("nativepipboy",String.format("valid surface update"));
         }
         else {
-            needsrefresh = true;
+            Log.i("nativepipboy",String.format("setting needs refresh"));
         }
     }
 

@@ -75,7 +75,6 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load  (JNIEnv *en
 
     size_t total_items = 30 + numitems; 
     size_t loaded = 0;
-    initialised = 1;
     glare           = new Image("screenglare_alpha.png",0.8,1.0,standard_tex_coords);
     fade            = new Image("fade.png",1.0,1.0,standard_tex_coords);
     band            = new Image("band.png",0.8,0.5,tex_coords);
@@ -152,19 +151,24 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init  (JNIEnv *en
     glEnable(GL_TEXTURE_2D);checkGlError(__LINE__);
     glEnableClientState(GL_VERTEX_ARRAY);checkGlError(__LINE__);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);checkGlError(__LINE__);
+    glDisableClientState(GL_COLOR_ARRAY);checkGlError(__LINE__);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);checkGlError(__LINE__);
     glDisable(GL_DEPTH_TEST);checkGlError(__LINE__);
-    glColor4f(0.54f, 0.43f, 0.19f,1.0f);
-    //glColor4f(0.54f,0.855f,0.58f,1.0f);
+    //glColor4f(0.54f, 0.43f, 0.19f,1.0f);
+    glColor4f(0.54f,0.855f,0.58f,1.0f);
 
     white_texture = GenTexture(1,1,(uint8_t*)&white);
     grey_texture = GenTexture(1,1,(uint8_t*)&grey);
     RefreshImages();
+    initialised = 1;
     
     LOGI("init monkey: %p %p",glare,viewlist);
 }
 
 JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_step (JNIEnv *, jclass) {
+    if(!initialised) {
+        return;
+    }
     glDisable(GL_DITHER);checkGlError(__LINE__);
 
     glTexEnvx(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
@@ -176,7 +180,7 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_step (JNIEnv *, j
      * glClear().
      */
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);checkGlError(__LINE__);
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);checkGlError(__LINE__);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);checkGlError(__LINE__);
 
     /*

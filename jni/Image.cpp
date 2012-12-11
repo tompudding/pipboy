@@ -258,7 +258,7 @@ void Image::RefreshTexture() {
         return;
     }
     texture = GenTexture(file_width,file_height,data);
-    LOGE("Refreshing texture:%s %d:%d:%p",fname,file_width,file_height,data);
+    LOGE("Refreshing texture:%s %d:%d:%p:%d",fname,file_width,file_height,data,texture);
 }
 
 void Image::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {

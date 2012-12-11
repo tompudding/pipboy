@@ -78,7 +78,6 @@ void ViewList::RightInView()
 
 void ViewList::Select()
 {
-    LOGI("m2");
     pthread_mutex_lock(&viewlist_mutex);
     (*current_view)->Select();
     pthread_mutex_unlock(&viewlist_mutex);
