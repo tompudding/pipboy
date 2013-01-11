@@ -34,6 +34,7 @@ Text *general_text = NULL;
 ItemConditionBar *general_condition_bar = NULL;
 int initialised = 0;
 struct timeval tv = {0};
+bool done = false;
 
 GLfloat standard_tex_coords[] = {0, 1.0,
                                  0, 0.0,
@@ -56,6 +57,9 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load  (JNIEnv *en
                                  0,0.0,
                                  256.0,0.0,
                                  256.0,24.0};
+    if(done) {
+        return;
+    }
     jclass cls = env->FindClass("com/tompudding/pipboy/ProgressCallback");
     jmethodID progress_method = NULL;
     jmethodID error_method = NULL;
@@ -67,10 +71,10 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load  (JNIEnv *en
         if(NULL == progress_method) {
             LOGI("Error finding progress method");
         }
-        //error_method = env->GetMethodID(cls, "fatalError", "(java/lang/String;)V");
-        //if(NULL == error_method) {
-        //    LOGI("Error finding error method");
-        //}
+        error_method = env->GetMethodID(cls, "fatalError", "(Ljava/lang/String;)V");
+        if(NULL == error_method) {
+            LOGI("Error finding error method");
+        }
     }
 
     size_t total_items = 30 + numitems; 
@@ -134,7 +138,10 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load  (JNIEnv *en
         LoadSounds(env,callbackClass,progress_method,&loaded,total_items);
     }
     catch(error e) {
+        jstring error = env->NewStringUTF("Error loading resources from zip file");
         LOGI("Error creating  %d",e);
+        done = true;
+        env->CallVoidMethod(callbackClass,error_method,error);
         font = NULL;
     }
 
@@ -145,6 +152,9 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init  (JNIEnv *en
     uint32_t grey = 0x808080ff;
     LOGI("init monkey");
     srand48(time(NULL));
+    if(done) {
+        return;
+    }
     sleep(1);
     glEnable(GL_BLEND);checkGlError(__LINE__);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);checkGlError(__LINE__);

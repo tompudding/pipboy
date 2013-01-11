@@ -111,7 +111,17 @@ class Progress implements ProgressCallback {
     }
     public void fatalError(String message) {
         Log.i("nativepipboy","Fatal error : " + message);
-        root.finish();
+        
+        AlertDialog alertDialog = new AlertDialog.Builder(root).create();
+        alertDialog.setTitle("Fatal Error");
+        alertDialog.setMessage(message);
+        alertDialog.setButton("Quit", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                root.finish();
+            }
+        });
+        alertDialog.show();
+        //root.finish();
     }
 }
 
@@ -133,13 +143,7 @@ public class PipboyActivity extends Activity implements OnClickListener{
         Log.i("nativepipboy",String.format("creating bob"));
         bob = new PipboyRenderer(this,jim);
         Log.i("nativepipboy",String.format("created bob"));
-        mGLView.setRenderer(bob);
-        mGLView.requestFocus();
-    }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         Log.i("nativepipboy",String.format("Jimbo:%d:%d",getWindowManager().getDefaultDisplay().getHeight(),getWindowManager().getDefaultDisplay().getWidth()));
         setContentView(R.layout.main);
         mGLView = (GLView) findViewById(R.id.glview);
@@ -158,16 +162,25 @@ public class PipboyActivity extends Activity implements OnClickListener{
                 return false;
             }
             });
-        /*
-        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("jim");
-        alertDialog.setMessage("bob");
-        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });
-        alertDialog.show();*/
+
+
+        mGLView.setOnClickListener(PipboyActivity.this); 
+                
+        if (DEBUG_CHECK_GL_ERROR) {
+            mGLView.setGLWrapper(new GLView.GLWrapper() {
+                public GL wrap(GL gl) {
+                    return GLDebugHelper.wrap(gl, GLDebugHelper.CONFIG_CHECK_GL_ERROR, null);
+                }});
+        }
+
+        mGLView.setRenderer(bob);
+        //setContentView(mGLView);
+        mGLView.requestFocus();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         progressBar = new ProgressDialog(this);
         progressBar.setCancelable(false);
@@ -178,23 +191,15 @@ public class PipboyActivity extends Activity implements OnClickListener{
         progressBar.show();
         NativePipboy.createEngine();
         NativePipboy.createBufferQueueAudioPlayer();
-        new Thread(new Runnable() {
-            public void run() {
+        //new Thread(new Runnable() {
+        //    public void run() {
                 createbob();
-            }
-        }).start();
-
-        mGLView.setOnClickListener(PipboyActivity.this); 
+                //    }
+                //}).start();
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
 
-        if (DEBUG_CHECK_GL_ERROR) {
-            mGLView.setGLWrapper(new GLView.GLWrapper() {
-                public GL wrap(GL gl) {
-                    return GLDebugHelper.wrap(gl, GLDebugHelper.CONFIG_CHECK_GL_ERROR, null);
-                }});
-        }
         
     }
 
@@ -202,13 +207,17 @@ public class PipboyActivity extends Activity implements OnClickListener{
     @Override
     protected void onPause() {
         super.onPause();
-        mGLView.onPause();
+        if(null != mGLView) {
+            mGLView.onPause();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mGLView.onResume();
+        if(null != mGLView) {
+            mGLView.onResume();
+        }
     }
 
     @Override  public void onConfigurationChanged(Configuration newConfig) {
