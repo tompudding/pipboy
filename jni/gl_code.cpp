@@ -57,9 +57,9 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load  (JNIEnv *en
                                  0,0.0,
                                  256.0,0.0,
                                  256.0,24.0};
-    if(done) {
-        return;
-    }
+    //if(done) {
+    //    return;
+    //}
     jclass cls = env->FindClass("com/tompudding/pipboy/ProgressCallback");
     jmethodID progress_method = NULL;
     jmethodID error_method = NULL;
@@ -152,9 +152,9 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init  (JNIEnv *en
     uint32_t grey = 0x808080ff;
     LOGI("init monkey");
     srand48(time(NULL));
-    if(done) {
-        return;
-    }
+    //if(done) {
+    //    return;
+    //}
     sleep(1);
     glEnable(GL_BLEND);checkGlError(__LINE__);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);checkGlError(__LINE__);
@@ -190,7 +190,7 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_step (JNIEnv *, j
      * glClear().
      */
 
-    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);checkGlError(__LINE__);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);checkGlError(__LINE__);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);checkGlError(__LINE__);
 
     /*

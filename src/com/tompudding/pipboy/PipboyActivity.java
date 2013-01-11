@@ -141,42 +141,47 @@ public class PipboyActivity extends Activity implements OnClickListener{
 
     public void createbob() {
         Log.i("nativepipboy",String.format("creating bob"));
-        bob = new PipboyRenderer(this,jim);
+        bob = new PipboyRenderer(PipboyActivity.this,jim);
         Log.i("nativepipboy",String.format("created bob"));
-
-        Log.i("nativepipboy",String.format("Jimbo:%d:%d",getWindowManager().getDefaultDisplay().getHeight(),getWindowManager().getDefaultDisplay().getWidth()));
-        setContentView(R.layout.main);
-        mGLView = (GLView) findViewById(R.id.glview);
-        float width  = getWindowManager().getDefaultDisplay().getWidth();
-        float height = getWindowManager().getDefaultDisplay().getHeight();
-        gestureDetector = new GestureDetector(mgd);
-        mGLView.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                Log.i("nativepipboy",String.format("touch event 1b %d",event.getAction()));
-                mgd.x  = getWindowManager().getDefaultDisplay().getWidth();
-                mgd.y  = getWindowManager().getDefaultDisplay().getHeight();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                Log.i("nativepipboy",String.format("Jimbo:%d:%d",getWindowManager().getDefaultDisplay().getHeight(),getWindowManager().getDefaultDisplay().getWidth()));
+                setContentView(R.layout.main);
+                mGLView = (GLView) findViewById(R.id.glview);
+                float width  = getWindowManager().getDefaultDisplay().getWidth();
+                float height = getWindowManager().getDefaultDisplay().getHeight();
+                gestureDetector = new GestureDetector(mgd);
+                mGLView.setOnTouchListener(new View.OnTouchListener() {
+                    public boolean onTouch(View v, MotionEvent event) {
+                        Log.i("nativepipboy",String.format("touch event 1b %d",event.getAction()));
+                        mgd.x  = getWindowManager().getDefaultDisplay().getWidth();
+                        mgd.y  = getWindowManager().getDefaultDisplay().getHeight();
                 
-                if (gestureDetector.onTouchEvent(event)) {
-                    return true;
+                        if (gestureDetector.onTouchEvent(event)) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
+
+                mGLView.setOnClickListener(PipboyActivity.this); 
+                
+                if (DEBUG_CHECK_GL_ERROR) {
+                    mGLView.setGLWrapper(new GLView.GLWrapper() {
+                        public GL wrap(GL gl) {
+                            return GLDebugHelper.wrap(gl, GLDebugHelper.CONFIG_CHECK_GL_ERROR, null);
+                        }});
                 }
-                return false;
+
+                mGLView.setRenderer(bob);
+                //setContentView(mGLView);
+                mGLView.requestFocus();
             }
-            });
-
-
-        mGLView.setOnClickListener(PipboyActivity.this); 
-                
-        if (DEBUG_CHECK_GL_ERROR) {
-            mGLView.setGLWrapper(new GLView.GLWrapper() {
-                public GL wrap(GL gl) {
-                    return GLDebugHelper.wrap(gl, GLDebugHelper.CONFIG_CHECK_GL_ERROR, null);
-                }});
-        }
-
-        mGLView.setRenderer(bob);
-        //setContentView(mGLView);
-        mGLView.requestFocus();
-    }
+        });
+    }       
+            
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,13 +196,13 @@ public class PipboyActivity extends Activity implements OnClickListener{
         progressBar.show();
         NativePipboy.createEngine();
         NativePipboy.createBufferQueueAudioPlayer();
-        //new Thread(new Runnable() {
-        //    public void run() {
+        new Thread(new Runnable() {
+            public void run() {
                 createbob();
-                //    }
-                //}).start();
+            }
+        }).start();
 
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //
 
 
         

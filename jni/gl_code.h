@@ -790,7 +790,7 @@ extern size_t numitems;
 extern itemmap_t item_map;
 
 
-#define DATA_DIR "/storage/sdcard1/pipboy/"
+#define DATA_DIR "/storage/sdcard0/pipboy/"
 #define ZIP_FILENAME "data.zip"
 
 #endif
