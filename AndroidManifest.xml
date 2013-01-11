@@ -9,8 +9,9 @@
         />
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:name=".PipboyActivity" android:label="@string/app_name"
-                    android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+                    android:theme="@style/Theme.MyTheme"
                     android:configChanges="orientation|keyboardHidden"
+                    android:screenOrientation="landscape"
                     android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,7 +20,7 @@
         </activity>
     </application>
     <uses-sdk android:minSdkVersion="9" 
-              android:targetSdkVersion="9"
+              android:targetSdkVersion="15"
               />
     <uses-permission android:name="android.permission.INTERNET" /> 
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />

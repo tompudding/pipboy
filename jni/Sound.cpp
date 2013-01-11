@@ -94,7 +94,7 @@ exit:
 SoundClip::SoundClip(const char *filename) {
     fname = strdup(filename);
     loaded = false;
-    size = GetSizeSound(filename);
+    //size = GetSizeSound(filename);
 
     sound_list.push_back(this); //can I do this?
 }
@@ -234,7 +234,7 @@ void LoadSounds(JNIEnv *env, jobject callbackClass, jmethodID progress_method, s
         if(*i != NULL) {
             (*i)->Load();
             if(progress_method) {                    
-                (*loaded) += (*i)->Size();                                            
+                (*loaded) += 1;//(*i)->Size();                                            
                 env->CallVoidMethod(callbackClass,progress_method,((float)(*loaded))/total_items); 
             }
         }
@@ -245,7 +245,7 @@ size_t NumSounds() {
     size_t num = 0;
     for(std::list<SoundClip*>::iterator i = sound_list.begin(); i != sound_list.end(); i++) {
         if(*i != NULL) {
-            num += (*i)->Size();
+            num += 1;//(*i)->Size();
         }
     }
     return num;

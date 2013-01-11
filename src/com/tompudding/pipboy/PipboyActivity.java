@@ -145,7 +145,6 @@ public class PipboyActivity extends Activity implements OnClickListener{
         Log.i("nativepipboy",String.format("created bob"));
         runOnUiThread(new Runnable() {
             public void run() {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 Log.i("nativepipboy",String.format("Jimbo:%d:%d",getWindowManager().getDefaultDisplay().getHeight(),getWindowManager().getDefaultDisplay().getWidth()));
                 setContentView(R.layout.main);
                 mGLView = (GLView) findViewById(R.id.glview);
@@ -164,7 +163,6 @@ public class PipboyActivity extends Activity implements OnClickListener{
                         return false;
                     }
                 });
-
 
                 mGLView.setOnClickListener(PipboyActivity.this); 
                 
@@ -186,7 +184,6 @@ public class PipboyActivity extends Activity implements OnClickListener{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         progressBar = new ProgressDialog(this);
         progressBar.setCancelable(false);
         progressBar.setMessage("Loading");
@@ -196,6 +193,8 @@ public class PipboyActivity extends Activity implements OnClickListener{
         progressBar.show();
         NativePipboy.createEngine();
         NativePipboy.createBufferQueueAudioPlayer();
+        setContentView(R.layout.main);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         new Thread(new Runnable() {
             public void run() {
                 createbob();
@@ -226,7 +225,7 @@ public class PipboyActivity extends Activity implements OnClickListener{
     }
 
     @Override  public void onConfigurationChanged(Configuration newConfig) {
-     super.onConfigurationChanged(newConfig);
+        super.onConfigurationChanged(newConfig);
     }
  
     @Override public boolean onPrepareOptionsMenu (Menu menu){

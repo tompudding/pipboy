@@ -85,7 +85,7 @@ Image::Image(const char *filename, GLfloat _width, GLfloat _height, GLfloat *tex
     if(NULL == fname) {
         throw MEMORY_ERROR;
     }
-    size = GetSizeImage(filename);
+    //size = GetSizeImage(filename);
     data   = NULL;
     width  = _width;
     height = _height;
@@ -292,7 +292,7 @@ void LoadImages(JNIEnv *env, jobject callbackClass, jmethodID progress_method, s
         if(*i != NULL) {
             (*i)->Load();
             if(progress_method) {                    
-                (*loaded) += (*i)->Size();                                            
+                (*loaded) += 1;//(*i)->Size();                                            
                 env->CallVoidMethod(callbackClass,progress_method,((float)(*loaded))/total_items); 
             }
         }
@@ -303,7 +303,7 @@ size_t NumImages() {
     size_t num = 0;
     for(std::list<Image*>::iterator i = image_list.begin(); i != image_list.end(); i++) {
         if(*i != NULL) {
-            num += (*i)->Size();
+            num += 1;//(*i)->Size();
         }
     }
     return num;
