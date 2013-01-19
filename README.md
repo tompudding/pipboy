@@ -16,10 +16,12 @@ Known Bugs
 
 FAQ
 ---
- _Why did you code this in C++ rather than Java_
+ **Why did you code this in C++ rather than Java**
+
  Because I don't know Java at all. 
 
 
- _Looking at your C++ it doesn't exactly look like you know that language though_
+ **Looking at your C++ it doesn't exactly look like you know that language though**
+
  Shut up. One header file for everything is a great choice! Like I said, This was just hacked together over a few weekends
 
