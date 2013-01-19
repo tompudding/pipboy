@@ -25,3 +25,6 @@ FAQ
 
  Shut up. One header file for everything is a great choice! Like I said, This was just hacked together over a few weekends
 
+ **I saw the sketch, where's the circuit diagram?**
+
+ Working on it!
