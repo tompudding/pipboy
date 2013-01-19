@@ -9,6 +9,13 @@ The bulk of the source code is for the pipboy app, which has been helpfully comp
  - install the apk
  - Run it!
 
+Control
+-------
+
+The primary form of control is meant to be from hardware buttons. However you implement your hardware, it should send TCP packets to the phone on port 4919 to control it. The exact format of the packets isn't documented yet, have a look at the arduino sketch or the source code for handling the packets on the phone side.
+
+There is also a debug touchscreen interface. Swiping left and right switches between tabs, and directional navigation is by clicking in the top,left,right or bottom parts of the screen. Long press is select, though it can be tricky to make that take sometimes.
+
 Known Bugs
 ----------
  - Sometimes it loads, but there's a black screen. Pressing home, then switching back to the app seems to fix it, but I have no idea why it happens and no time to fix it.
