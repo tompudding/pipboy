@@ -473,13 +473,41 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
                                   "Swift Learner",
                                   "Travel Light",
                                   "The Award Winning"};
+    int i,j;
 
     display_start = 0;
     display_num   = 8;
     current_item  = 0;
+    num_perks     = 13;
 
-    memcpy(descriptions,temp_desc,sizeof(descriptions));
-    memcpy(names,temp_names,sizeof(names));
+    //There's all kinds of memory leaks here. This is what you get for using C++ in a weird C
+    //type fashing where you don't use objects for things. Sigh.
+    icons = (Image**)malloc(num_perks*sizeof(Image*));
+    if(NULL == icons) {
+        throw MEMORY_ERROR;
+    }
+    names = (const char**)malloc(num_perks*sizeof(char*));
+    if(NULL == names) {
+        throw MEMORY_ERROR;
+    }
+    descriptions = (const char***)malloc(num_perks*sizeof(char**));
+    if(NULL == descriptions) {
+        throw MEMORY_ERROR;
+    }
+    for(i=0;i<num_perks;i++) {
+        //Magic numbers, yay!
+        descriptions[i] = (const char**)malloc(5*sizeof(char*));
+        if(NULL == descriptions[i]) {
+            throw MEMORY_ERROR;
+        }
+        for(j=0;j<5;j++) {
+            descriptions[i][j] = temp_desc[i][j];
+        }
+    }
+
+    for(i=0;i<num_perks;i++) {
+        names[i] = temp_names[i];
+    }
 
     icons[ 0] = new Image("perk_life_giver.png",480./800,1.0,standard_tex_coords);
     icons[ 1] = new Image("perk_action_boy.png",480./800,1.0,standard_tex_coords);
@@ -495,10 +523,10 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
     icons[11] = new Image("perk_travel_light.png",480./800,1.0,standard_tex_coords);
     icons[12] = new Image("perk_challenge.png",480./800,1.0,standard_tex_coords);
 
-    for(int i=0;i<13;i++)
+    for(int i=0;i<num_perks;i++)
         items.push_back( PlacementInfo(0.17,0.8-0.08*i,1.4,1.4,new Text(names[i],font)) );
 
-    for(int i=0;i<13;i++)
+    for(int i=0;i<num_perks;i++)
         if(icons[i] == NULL)
             throw MEMORY_ERROR; //memory leak fixme
 
@@ -623,7 +651,7 @@ void SkillsSubView::VerticalPos(float pos,int sound) {
 
 void PerksSubView::Down() {
     pthread_mutex_lock(&items_mutex);
-    if(current_item != 12)
+    if(current_item != num_perks-1)
     {
         current_item++;
         PlayClip(*menu_prevnext);

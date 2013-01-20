@@ -617,15 +617,16 @@ public:
     void Down() ;
     void VerticalPos(float pos,int sound);
 
-    Image *icons[13];
-    const char *names[13]; 
-    const char *descriptions[13][5];
+    Image **icons;
+    const char **names; 
+    const char ***descriptions;
     uint32_t current_item;
     Box selected_box;
     HalfBox box;
     size_t display_start;
     size_t current_pos;
     size_t display_num;
+    size_t num_perks;
     ScrollBar *scrollbar;
 
 };
