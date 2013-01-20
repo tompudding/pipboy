@@ -109,18 +109,22 @@ class Progress implements ProgressCallback {
             root.progressBar.dismiss();
         }
     }
-    public void fatalError(String message) {
+    public void fatalError(final String message) {
         Log.i("nativepipboy","Fatal error : " + message);
         
-        AlertDialog alertDialog = new AlertDialog.Builder(root).create();
-        alertDialog.setTitle("Fatal Error");
-        alertDialog.setMessage(message);
-        alertDialog.setButton("Quit", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                root.finish();
+        root.runOnUiThread(new Runnable() {
+            public void run() {
+                AlertDialog alertDialog = new AlertDialog.Builder(root).create();
+                alertDialog.setTitle("Fatal Error");
+                alertDialog.setMessage(message);
+                alertDialog.setButton("Quit", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        root.finish();
+                    }
+                });
+                alertDialog.show();
             }
         });
-        alertDialog.show();
         //root.finish();
     }
 }

@@ -394,91 +394,27 @@ SkillsSubView::SkillsSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.0
 
 PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007){
     pthread_mutex_init(&items_mutex,NULL);
-    const char *temp_desc[13][5] = { {"Your beard strikes fear into the",
-                                      "heart of your opponents, and ",
-                                      "opens up new dialogue options. It",
-                                      "also absorbs 90% of all damage",
-                                      ""},
-                                     {"All know of your legendary",
-                                      "awesomeness. The higher an enemy's",
-                                      "intelligence, the more likely they",
-                                      "are to run away from you",
-                                      ""},
-                                     {"Chems last twice as long",
-                                      "",
-                                      "",
-                                      "",
-                                      ""},
-                                     {"You gain one additional skill",
-                                      "point for reading books and double",
-                                      "the skill points for reading",
-                                      "magazines.",
-                                      ""},
-                                     {"Can hack a locked down ",
-                                      "terminal with four more",
-                                      "chances.",
-                                      "",
-                                      ""},
-                                     {"Costumes with electronic",
-                                      "components can be constructed",
-                                      "200% faster",
-                                      "",
-                                      ""},
-                                     {"With the Educated perk, you gain",
-                                      "two more skill points every time",
-                                      "you advance in level. This perk is",
-                                      "best taken early on, to maximise",
-                                      "its effectiveness"},
-                                     {"While wearing any type of",
-                                      "glasses, you have +1 PER. Without",
-                                      "glasses, you have -1 PER",
-                                      "",
-                                      ""},
-                                     {"You are able to optimize your",
-                                      "Pip-Boy's V.A.T.S logic, reducing",
-                                      "all AP costs by 10%",
-                                      "",
-                                      ""},
-                                     {"+15 DT and Strength increased to",
-                                      "10 whenever health is 20% or",
-                                      "lower.",
-                                      "",
-                                      ""},
-                                     {"With each rank in the Swift",
-                                      "Learner perk, you gain an",
-                                      "additional 10% to toal",
-                                      "Experience Points whenever",
-                                      "Experience Points are earned."},
-                                     {"While wearing light armor or",
-                                      "no armor, you run 10% faster.",
-                                      "",
-                                      "",
-                                      ""},
-                                     {"Numerous prestigious awards",
-                                      "have given you spectacular",
-                                      "superpowers. Speech is set",
-                                      "to 100% for interlocutors with",
-                                      "intelligence less than 4."},
-    };
-    const char *temp_names[13] = {"Amazing Beard",
-                                  "Captain Awesome",
-                                  "Chemist",
-                                  "Comprehension",
-                                  "Computer Whizz",
-                                  "Costume Guy",
-                                  "Educated",
-                                  "Four Eyes",
-                                  "Math Wrath",
-                                  "Nerd Rage",
-                                  "Swift Learner",
-                                  "Travel Light",
-                                  "The Award Winning"};
     int i,j;
+    FILE *f;
+    char buffer[1024] = {0};
 
     display_start = 0;
     display_num   = 8;
     current_item  = 0;
-    num_perks     = 13;
+    num_perks     = 0;
+
+    f = fopen(DATA_DIR "perks.txt","rb");
+    if(NULL == f) {
+        throw FILE_NOT_FOUND;
+    }
+    while(NULL != fgets(buffer,sizeof(buffer),f)) {
+    //do a first pass to establish how many perks we're doing
+        if(buffer[0] == '\0' || buffer[0] == '#' || buffer[0] == '\n') {
+            continue;
+        }
+        num_perks++;
+    }
+    LOGI("perks*** : Have %d perks",num_perks);
 
     //There's all kinds of memory leaks here. This is what you get for using C++ in a weird C
     //type fashing where you don't use objects for things. Sigh.
@@ -501,39 +437,73 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
             throw MEMORY_ERROR;
         }
         for(j=0;j<5;j++) {
-            descriptions[i][j] = temp_desc[i][j];
+            descriptions[i][j] = NULL;
         }
     }
 
-    for(i=0;i<num_perks;i++) {
-        names[i] = temp_names[i];
+    fseek(f,0,SEEK_SET);
+    i = 0;
+    while(NULL != fgets(buffer,sizeof(buffer),f)) {
+    //do a first pass to establish how many perks we're doing
+        char *saveptr;
+        if(buffer[0] == '\0' || buffer[0] == '#' || buffer[0] == '\n') {
+            continue;
+        }
+        //strtok is a well known terrible function, but it's all I've got.
+        names[i] = strtok_r(buffer,"|",&saveptr);
+        if(NULL == names[i]) {
+            throw FILE_ERROR;
+        }
+        LOGI("perks*** : Perk[%d] : %s",i,names[i]);
+        //names[i] is pointing to a stack buffer, need a copy of it before this function leaves...
+        names[i] = strdup(names[i]);
+        char *filename = strtok_r(NULL,"|",&saveptr);
+        if(NULL == filename) {
+            throw FILE_ERROR;
+        }
+        icons[i] = new Image(filename,480./800,1.0,standard_tex_coords);
+        if(NULL == icons[i]) {
+            throw MEMORY_ERROR;
+        }
+        for(j=0;j<5;j++) {
+            descriptions[i][j] = strtok_r(NULL,"|",&saveptr);
+            if(NULL == descriptions[i][j]) {
+                descriptions[i][j] = strdup(" ");
+            }
+            else {
+                for(int k=0;descriptions[i][j][k];k++) {
+                    if(descriptions[i][j][k] == '\n') {
+                        ((char*)(descriptions[i][j]))[k] = ' ';
+                    }
+                }
+                descriptions[i][j] = strdup(descriptions[i][j]);
+            }
+            LOGI("perks*** : Perk[%d] : %s",i,descriptions[i][j]);
+        }
+        i++;
     }
-
-    icons[ 0] = new Image("perk_life_giver.png",480./800,1.0,standard_tex_coords);
-    icons[ 1] = new Image("perk_action_boy.png",480./800,1.0,standard_tex_coords);
-    icons[ 2] = new Image("perk_chemist.png",480./800,1.0,standard_tex_coords);
-    icons[ 3] = new Image("perk_comprehension.png",480./800,1.0,standard_tex_coords);
-    icons[ 4] = new Image("perk_l33t_haxx0r.png",480./800,1.0,standard_tex_coords);
-    icons[ 5] = new Image("perk_robotics_expert.png",480./800,1.0,standard_tex_coords);
-    icons[ 6] = new Image("perk_educated.png",480./800,1.0,standard_tex_coords);
-    icons[ 7] = new Image("perk_four_eyes.png",480./800,1.0,standard_tex_coords);
-    icons[ 8] = new Image("perk_math_wrath.png",480./800,1.0,standard_tex_coords);
-    icons[ 9] = new Image("perk_nerd_rage!.png",480./800,1.0,standard_tex_coords);
-    icons[10] = new Image("perk_swift_learner.png",480./800,1.0,standard_tex_coords);
-    icons[11] = new Image("perk_travel_light.png",480./800,1.0,standard_tex_coords);
-    icons[12] = new Image("perk_challenge.png",480./800,1.0,standard_tex_coords);
 
     for(int i=0;i<num_perks;i++)
         items.push_back( PlacementInfo(0.17,0.8-0.08*i,1.4,1.4,new Text(names[i],font)) );
-
-    for(int i=0;i<num_perks;i++)
-        if(icons[i] == NULL)
-            throw MEMORY_ERROR; //memory leak fixme
 
     scrollbar = new ScrollBar();
     if(scrollbar == NULL)
         throw MEMORY_ERROR;
     scrollbar->SetData(items.size(),display_start,display_num);
+}
+
+PerksSubView::~PerksSubView() {
+    int i,j;
+    for(i=0;i<num_perks;i++) {
+        if(NULL != names[i]) {
+            free((void*)names[i]);
+        }
+        for(j=0;j<5;j++) {
+            if(NULL != descriptions[i][j]) {
+                free((void*)descriptions[i][j]);
+            }
+        }
+    }
 }
 
 GeneralSubView::GeneralSubView() : selected_box(0.46,0.08,0.007) {

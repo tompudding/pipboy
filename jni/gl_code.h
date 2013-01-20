@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <png.h>
 #include <zip.h>
@@ -611,6 +612,7 @@ public:
 class PerksSubView : public View {
 public:
     PerksSubView();
+    ~PerksSubView();
     
     void Draw(GLfloat x,GLfloat y,GLfloat xscale=1.0, GLfloat yscale=1.0);
     void Up() ;
