@@ -381,7 +381,7 @@ SkillsSubView::SkillsSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.0
                                      "weapons designed for",
                                      "hand-to-hand combat, like Brass",
                                       "knuckles and Power Fists."}};
-    uint32_t temp_stats[13] = {35,0,0,3,5,7,25,40,81,27,40,23,20};
+    //uint32_t temp_stats[13] = {35,0,0,3,5,7,25,40,81,27,40,23,20};
     const char *temp_names[13] = {"Barter",
                                   "Energy Weapons",
                                   "Explosives",
@@ -395,14 +395,37 @@ SkillsSubView::SkillsSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.0
                                   "Speech",
                                   "Survival",
                                   "Unarmed"};
+    FILE *f;
+    error result = OK;
+    char buffer[1024] = {0};
+    int i;
 
     display_start = 0;
     display_num   = 8;
     current_item  = 0;
 
     memcpy(descriptions,temp_desc,sizeof(descriptions));
-    memcpy(stats,temp_stats,sizeof(stats));
     memcpy(names,temp_names,sizeof(names));
+
+    f = fopen(DATA_DIR "skills.txt","rb");
+    if(NULL == f) {
+        result = FILE_NOT_FOUND;
+        goto finish;
+    }
+    for(i=0;i<13;i++) {
+        if(NULL == fgets(buffer,sizeof(buffer),f)) {
+            //file ran out before we got all the data
+            result = FILE_ERROR;
+            goto close_file;
+        }
+        stats[i] = strtoul(buffer,NULL,10);
+        if(stats[i] < 0) {
+            stats[i] = 0;
+        }
+        if(stats[i] > 100) {
+            stats[i] = 100;
+        }
+    }
 
     icons[ 0] = new Image("skills_barter.png",480./800,1.0,standard_tex_coords);
     icons[ 1] = new Image("skills_energy_weapons.png",480./800,1.0,standard_tex_coords);
@@ -422,14 +445,38 @@ SkillsSubView::SkillsSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.0
         items.push_back( PlacementInfo(0.17,0.8-0.08*i,1.4,1.4,new Text(names[i],font)) );
 
     for(int i=0;i<13;i++)
-        if(icons[i] == NULL)
-            throw MEMORY_ERROR; //memory leak fixme
+        if(icons[i] == NULL) {
+            result = MEMORY_ERROR; //memory leak fixme
+            goto cleanup;
+        }
 
     scrollbar = new ScrollBar();
-    if(scrollbar == NULL)
-        throw MEMORY_ERROR;
+    if(scrollbar == NULL) {
+        result = MEMORY_ERROR;
+        goto cleanup;
+    }
     scrollbar->SetData(items.size(),display_start,display_num);
-    
+
+cleanup:
+    //We don't free the texts, so this is a memory leak. fix in the future if I can be bothered
+    if(OK != result) {
+        for(i=0;i<13;i++) {
+            if(NULL != icons[i]) {
+                delete icons[i];
+            }
+        }
+    }
+
+close_file:
+    if(NULL != f) {
+        fclose(f);
+    }
+
+finish:
+    if(result != OK) {
+        throw result;
+    }
+
 }
 
 PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007){
