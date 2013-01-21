@@ -199,6 +199,7 @@ SleepSubView::SleepSubView() {
 
 SpecialSubView::SpecialSubView() : selected_box(0.42,0.08,0.007),box(0.78,0.08,0.007) {
     pthread_mutex_init(&items_mutex,NULL);
+    char buffer[1024] = {0};
     const char *temp_desc[7][5] = { {"Strength is a measure of your raw",
                                      "physical power. It affects how much you",
                                      "can carry, the power of all melee",
@@ -231,14 +232,30 @@ SpecialSubView::SpecialSubView() : selected_box(0.42,0.08,0.007),box(0.78,0.08,0
                                      "also improve your critical chance with",
                                      "all weapons.",""}};
 
+    FILE *f;
+    error result = OK;
+    int i;
+
     memcpy(descriptions,temp_desc,sizeof(descriptions));
-    stats[0] = 5;
-    stats[1] = 3;
-    stats[2] = 4;
-    stats[3] = 4;
-    stats[4] = 7;
-    stats[5] = 5;
-    stats[6] = 5;
+    f = fopen(DATA_DIR "special.txt","rb");
+    if(NULL == f) {
+        result = FILE_NOT_FOUND;
+        goto finish;
+    }
+    for(i=0;i<7;i++) {
+        if(NULL == fgets(buffer,sizeof(buffer),f)) {
+            //file ran out before we got all the data
+            result = FILE_ERROR;
+            goto close_file;
+        }
+        stats[i] = strtoul(buffer,NULL,10);
+        if(stats[i] < 0) {
+            stats[i] = 0;
+        }
+        if(stats[i] > 10) {
+            stats[i] = 10;
+        }
+    }
     
     names[0] = "Strength";
     names[1] = "Perception";
@@ -261,16 +278,39 @@ SpecialSubView::SpecialSubView() : selected_box(0.42,0.08,0.007),box(0.78,0.08,0
     {
         Text *t = new Text(names[i],font);
         if(NULL == t) {
-            throw MEMORY_ERROR;
+            result = MEMORY_ERROR;
+            goto cleanup;
         }
         items.push_back( PlacementInfo(0.17,0.8-0.08*i,1.4,1.4,t) );
     }
 
     for(int i=0;i<7;i++)
-        if(icons[i] == NULL)
-            throw MEMORY_ERROR; //memory leak fixme
+        if(icons[i] == NULL) {
+            result = MEMORY_ERROR;
+            goto cleanup;
+        }
 
     current_item = 0;
+
+cleanup:
+    //We don't free the texts, so this is a memory leak. fix in the future if I can be bothered
+    if(OK != result) {
+        for(i=0;i<7;i++) {
+            if(NULL != icons[i]) {
+                delete icons[i];
+            }
+        }
+    }
+
+close_file:
+    if(NULL != f) {
+        fclose(f);
+    }
+
+finish:
+    if(result != OK) {
+        throw result;
+    }
     
 }
 
@@ -397,6 +437,10 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
     int i,j;
     FILE *f;
     char buffer[1024] = {0};
+    error result = OK;
+    icons = NULL;
+    names = NULL;
+    descriptions = NULL;
 
     display_start = 0;
     display_num   = 8;
@@ -405,7 +449,8 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
 
     f = fopen(DATA_DIR "perks.txt","rb");
     if(NULL == f) {
-        throw FILE_NOT_FOUND;
+        result = FILE_NOT_FOUND;
+        goto finish;
     }
     while(NULL != fgets(buffer,sizeof(buffer),f)) {
     //do a first pass to establish how many perks we're doing
@@ -414,27 +459,35 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
         }
         num_perks++;
     }
+
     LOGI("perks*** : Have %d perks",num_perks);
 
     //There's all kinds of memory leaks here. This is what you get for using C++ in a weird C
     //type fashing where you don't use objects for things. Sigh.
     icons = (Image**)malloc(num_perks*sizeof(Image*));
     if(NULL == icons) {
-        throw MEMORY_ERROR;
+        result = MEMORY_ERROR;
+        goto cleanup;
     }
+    memset(icons,0,num_perks*sizeof(Image*));
     names = (const char**)malloc(num_perks*sizeof(char*));
     if(NULL == names) {
-        throw MEMORY_ERROR;
+        result = MEMORY_ERROR;
+        goto cleanup;
     }
+    memset(icons,0,num_perks*sizeof(char*));
     descriptions = (const char***)malloc(num_perks*sizeof(char**));
     if(NULL == descriptions) {
-        throw MEMORY_ERROR;
+        result = MEMORY_ERROR;
+        goto cleanup;
     }
+    memset(descriptions,0,num_perks*sizeof(char**));
     for(i=0;i<num_perks;i++) {
         //Magic numbers, yay!
         descriptions[i] = (const char**)malloc(5*sizeof(char*));
         if(NULL == descriptions[i]) {
-            throw MEMORY_ERROR;
+            result = MEMORY_ERROR;
+            goto cleanup;
         }
         for(j=0;j<5;j++) {
             descriptions[i][j] = NULL;
@@ -452,18 +505,21 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
         //strtok is a well known terrible function, but it's all I've got.
         names[i] = strtok_r(buffer,"|",&saveptr);
         if(NULL == names[i]) {
-            throw FILE_ERROR;
+            result = FILE_ERROR;
+            goto cleanup;
         }
         LOGI("perks*** : Perk[%d] : %s",i,names[i]);
         //names[i] is pointing to a stack buffer, need a copy of it before this function leaves...
         names[i] = strdup(names[i]);
         char *filename = strtok_r(NULL,"|",&saveptr);
         if(NULL == filename) {
-            throw FILE_ERROR;
+            result = FILE_ERROR;
+            goto cleanup;
         }
         icons[i] = new Image(filename,480./800,1.0,standard_tex_coords);
         if(NULL == icons[i]) {
-            throw MEMORY_ERROR;
+            result = MEMORY_ERROR;
+            goto cleanup;
         }
         for(j=0;j<5;j++) {
             descriptions[i][j] = strtok_r(NULL,"|",&saveptr);
@@ -482,14 +538,53 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
         }
         i++;
     }
+    
 
     for(int i=0;i<num_perks;i++)
         items.push_back( PlacementInfo(0.17,0.8-0.08*i,1.4,1.4,new Text(names[i],font)) );
 
     scrollbar = new ScrollBar();
-    if(scrollbar == NULL)
-        throw MEMORY_ERROR;
+    if(scrollbar == NULL) {
+        result = MEMORY_ERROR;
+        goto cleanup;
+    }
     scrollbar->SetData(items.size(),display_start,display_num);
+
+cleanup:
+    if(result != OK) {
+        for(i=0;i<num_perks;i++) {
+            if(NULL != names[i]) {
+                free((void*)names[i]);
+            }
+            for(j=0;j<5;j++) {
+                if(NULL != descriptions[i][j]) {
+                    free((void*)descriptions[i][j]);
+                }
+            }
+            if(NULL != icons[i]) {
+                delete icons[i];
+            }
+        }
+        if(NULL != icons) {
+            free((void*)icons);
+        }
+        if(NULL != names) {
+            free((void*)names);
+        }
+        if(NULL != descriptions) {
+            free((void*)descriptions);
+        }
+    }
+
+close_file:
+    if(NULL != f) {
+        fclose(f);
+    }
+
+finish:
+    if(result != OK) {
+        throw result;
+    }
 }
 
 PerksSubView::~PerksSubView() {
@@ -503,6 +598,15 @@ PerksSubView::~PerksSubView() {
                 free((void*)descriptions[i][j]);
             }
         }
+    }
+    if(NULL != icons) {
+        free((void*)icons);
+    }
+    if(NULL != names) {
+        free((void*)names);
+    }
+    if(NULL != descriptions) {
+        free((void*)descriptions);
     }
 }
 
@@ -710,8 +814,9 @@ void SpecialSubView::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {
     }
 
     for(int i=0;i<7;i++) {
-        char temp[2] = {0};
-        temp[0] = '0' + ((stats[i]%10));
+        char temp[3] = {0};
+        temp[0] = stats[i] >= 10 ? '1' : ' ';
+        temp[1] = '0' + ((stats[i]%10));
         general_text->text = (const char*)&temp;
         general_text->Draw(x+0.33,y+0.8-0.08*i,1.4,1.4);
     }
