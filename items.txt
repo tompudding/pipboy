@@ -1,0 +1,11 @@
+#category|name|weight|damage|strength_requirement|unarmed_requirement|small_arms_requirement|melee_requirement|explosives_requirement|energy_requirement|big_guns_requirement|value|damage_reduction|condition|calibre|armour_class|special|icon_filename
+weapons|Pool Cue|1|15|2|-1|-1|0|-1|-1|-1|14|0|0.91|0|--|--|weapons_pool_cue.png
+weapons|Tire Iron|3|15|0|-1|-1|0|-1|-1|-1|40|0|0.7|0|--|--|weapons_tire_iron.png
+weapons|Alien Blaster|2|75|1|-1|-1|-1|-1|75|-1|4000|0|0.95|308|--|--|weapons_alien_blaster.png
+apparel|Vault 76 Jumpsuit|1|56|6|0|75|0|0|0|0|6|1|0.91|308|Light|Melee Weapons +2, Speech +2|vault_suit_76.png
+apparel|Eyeglasses|0|56|6|0|75|0|0|0|0|8|-1|0.91|308|Light|PER +2|apperal_eyeglasses.png
+apparel|Red Bandana|1|56|6|0|75|0|0|0|0|6|0|0.91|308|--|--|apperal_red_bandana.png
+aid|Antivenom|0|56|6|0|75|0|0|0|0|25|0|0.91|308|--|Cure Animal Poison|item_antivenom.png
+aid|Jet|0|56|6|0|75|0|0|0|0|20|0|0.91|308|--|AP +15|item_jet.png
+misc|Bobby Pin|0|56|6|0|75|0|0|0|0|1|0|0.91|308|--|--|item_bobby_pin.png
+ammo|308 Ammo|0.05|56|6|0|75|0|0|0|0|5|0|0.91|308|--|--|items__308_ammo.png

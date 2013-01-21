@@ -509,8 +509,6 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
 
     LOGI("perks*** : Have %d perks",num_perks);
 
-    //There's all kinds of memory leaks here. This is what you get for using C++ in a weird C
-    //type fashing where you don't use objects for things. Sigh.
     icons = (Image**)malloc(num_perks*sizeof(Image*));
     if(NULL == icons) {
         result = MEMORY_ERROR;
