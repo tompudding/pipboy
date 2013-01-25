@@ -133,16 +133,16 @@ def pythonDecodeDXT3(data):
 
         # Decode this block into 4x4 pixels
         # Accumulate the results onto our 4 row accumulators
-        print hex(alpha)
+        #print hex(alpha)
         for yo in xrange(4):
             for xo in xrange(4):
                 # get next control op and generate a pixel
                 
                 control = bits & 3
                 bits = bits >> 2
-                pixel_alpha = (alpha&0xf)*20
-                if (pixel_alpha > 192):
-                    print pixel_alpha
+                pixel_alpha = ((alpha&0xf)*20)
+                if (pixel_alpha > 255):
+                    pixel_alpha = 255
                 alpha >>= 4
                 if control == 0:
                     out[yo] += chr(r0) + chr(g0) + chr(b0) + chr(pixel_alpha)

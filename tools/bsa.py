@@ -49,7 +49,7 @@ class FileRecord(object):
         self.size &= (~(1<<30))
 
     def read(self):
-        print self.name,hex(self.offset),self.compressed
+        #print self.name,hex(self.offset),self.compressed
         self.f.seek(self.offset)
         if self.compressed:
             name_size = ord(self.f.read(1))
@@ -122,15 +122,50 @@ if __name__ == '__main__':
     import DDSImageFile
     import dds
     import zipfile
+    import re
+
+    essential = set(('special_luck.dds'          ,
+                     'special_intelligence.dds'  ,
+                     'special_endurance.dds'     ,
+                     'special_strength.dds'      ,
+                     'special_perception.dds'    ,
+                     'special_charisma.dds'      ,
+                     'special_agility.dds'       ,
+                     'skills_barter.dds'         ,
+                     'skills_energy_weapons.dds' ,
+                     'skills_small_guns.dds'     ,
+                     'skills_lockpick.dds'       ,
+                     'skills_medicine.dds'       ,
+                     'skills_melee_weapons.dds'  ,
+                     'skills_repair.dds'         ,
+                     'skills_science.dds'        ,
+                     'skills_sneak.dds'          ,
+                     'skills_speech.dds'         ,
+                     'skills_survival.dds'       ,
+                     'skills_unarmed.dds'        ,
+                     'monofonto_verylarge02_dialogs2_0_lod_a.dds'))
+
+    other_wanted = set(('power_armor.dds' ,
+                        'right_leg.dds'   ,
+                        'right_arm.dds'   ,
+                        'torso.dds'       ,
+                        'head.dds'        ,
+                        'left_leg.dds'    ,
+                        'left_arm.dds'    ,
+                        'forward.dds'     ,
+                        'backward.dds'    ,
+                        'left.dds'        ,
+                        'right.dds'       ,
+                        'monofonto_verylarge02_dialogs2_0_lod_a.dds'))
 
     #start the output zipfile
     with zipfile.ZipFile(sys.argv[2],'w') as output_zip:
         bsa = BSAFile(sys.argv[1])
         out = sys.argv[2]
-        print bsa.version
+        #print bsa.version
         for file_record in bsa.file_records.values():
-            #print file_record.name
-            if 'perk_bloody_mess' in file_record.name:
+            print file_record.name
+            if re.match('(perk|special|reputations|skills|weap|weapons|vault_suit|item|items|apperal|appearal|apparel|missile)_.*\.dds',file_record.name) or file_record.name in other_wanted:
                 data = file_record.read()
                 data_file = StringIO.StringIO(data)
                 im = Image.open(data_file)
@@ -139,8 +174,15 @@ if __name__ == '__main__':
                 png_data = png_data.getvalue()
                 new_name = file_record.name.replace('.dds','.png')
                 output_zip.writestr(new_name,png_data)
-                print len(png_data)
+                print file_record.name,len(png_data)
+                try:
+                    essential.remove(file_record.name)
+                except KeyError:
+                    pass
                 #print im
                 #with open(out,'wb') as f:
                 #    f.write(data)
                 #raise SystemExit
+
+    for item in essential:
+        print 'missing',item

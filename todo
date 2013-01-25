@@ -3,8 +3,10 @@ done - replace raw files
 done - move the sounds to the zip file
      - move init to a class and prevent the errors on startup  
 done - loading screen / error messages
-     - make the errors helpful
+done - make the errors helpful
 done - move configuration to a text file
+     - Remove survival skill if the image isn't there (i.e. built from fallout 3 and not NV)
+     - Make the dataview and songs configurable
      - fix the lifecycle stuff, which may be related to the next thing
      - fix the weird occasional black screen issue
      - replace the .snd files with compressed mp3s or such
