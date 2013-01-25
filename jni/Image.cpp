@@ -83,7 +83,7 @@ exit:
 Image::Image(const char *filename, GLfloat _width, GLfloat _height, GLfloat *tex_coords) {
     fname  = strdup(filename);
     if(NULL == fname) {
-        throw MEMORY_ERROR;
+        throw ErrorMessage(MEMORY_ERROR,"Memory error in image constructor");;
     }
     //size = GetSizeImage(filename);
     data   = NULL;
@@ -248,8 +248,10 @@ close_zip:
     zip_close(z);
 exit:
     if(status != OK) {
+        string message("Error Loading image from file ");
+        message += fname;
         LOGI("Error status %d processing file %s\n",status,fname);
-        throw status;
+        throw ErrorMessage(status,message);
     }
 }
 

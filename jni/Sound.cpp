@@ -60,8 +60,11 @@ close_zip:
     zip_close(z);
 exit:
     if(status != OK) {
+        string message("Error Loading sound from file ");
+        message += temp_path;
+
         LOGI("Error status %d processing file %s\n",status,temp_path);
-        throw status;
+        throw ErrorMessage(status,message);
     }
 }
 
@@ -133,7 +136,7 @@ RandomSoundClip::RandomSoundClip(char **filename) {
         count++;
     filenames = (char**)malloc(sizeof(char*)*count);
     if(NULL == filenames) {
-        throw MEMORY_ERROR;
+        throw ErrorMessage(MEMORY_ERROR,"Out of Memory");
     }
     for(char **p = filename; *p; p++,i++) {
         filenames[i] = strdup(*p);
@@ -153,16 +156,16 @@ void RandomSoundClip::Load() {
         LOGI("Got %u rs filenames",count);
 
         if(count > 256)
-            throw MEMORY_ERROR;
+            throw ErrorMessage(MEMORY_ERROR,"Out of Memory");
 
         buffer = (short **)malloc(sizeof(short*)*count);
         if(NULL == buffer)
-            throw MEMORY_ERROR;
+            throw ErrorMessage(MEMORY_ERROR,"Out of Memory");
         memset(buffer,0,sizeof(short*)*count);
 
         size   = (size_t*)malloc(sizeof(size_t)*count);
         if(NULL == size)
-            throw MEMORY_ERROR;
+            throw ErrorMessage(MEMORY_ERROR,"Out of Memory"); 
         memset(size,0,sizeof(size_t)*count);
         int i = 0;
         for(i=0;i<count;i++) {
@@ -170,7 +173,8 @@ void RandomSoundClip::Load() {
         }
         loaded = true;
     }
-    catch (error e) {
+    //This is a big lame that we have to do this. Hacks all round
+    catch (ErrorMessage e) {
         if(NULL != buffer) {
             for(int i=0;i<count;i++) {
                 if(NULL != buffer[i]) {
@@ -210,7 +214,7 @@ void RandomSoundClip::GetBuffer(short **outbuffer, size_t *outsize) {
     unsigned long val = lrand48();
 
     if(!loaded) {
-        throw UNINITIALISED;
+        throw ErrorMessage(UNINITIALISED,"Uninitialised Randomsoundclip used");
     }
 
     val = val%count;

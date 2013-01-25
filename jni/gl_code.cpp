@@ -103,8 +103,8 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load  (JNIEnv *en
                                         "ui_static_d_04.wav.snd",
                                         "ui_static_d_05.wav.snd",
                                         NULL};
-        //if(NULL == listener)
-        //    listener  = new Listener();
+        if(NULL == listener)
+            listener  = new Listener();
         font      = new Font("monofonto_verylarge02_dialogs2.png","monofonto_verylarge02_dialogs2.fnt");
         general_text = new Text("balls",font);
         //do 12 random weapons
@@ -137,9 +137,9 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load  (JNIEnv *en
         LoadImages(env,callbackClass,progress_method,&loaded,total_items);
         LoadSounds(env,callbackClass,progress_method,&loaded,total_items);
     }
-    catch(error e) {
-        jstring error = env->NewStringUTF("Error loading resources from zip file");
-        LOGI("Error creating  %d",e);
+    catch(ErrorMessage message) {
+        jstring error = env->NewStringUTF(message.message.c_str());
+        LOGI("Error creating  %s",message.message.c_str());
         done = true;
         env->CallVoidMethod(callbackClass,error_method,error);
         font = NULL;

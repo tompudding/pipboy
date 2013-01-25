@@ -132,7 +132,7 @@ Listener::Listener(int port) {
     SetExit(0);
     if(0 != pthread_create(&listen_thread,NULL,listen_entry,NULL))
     {
-        throw THREAD_ERROR;
+        throw ErrorMessage(THREAD_ERROR,"Error creating listener thread");;
     }
 }
 

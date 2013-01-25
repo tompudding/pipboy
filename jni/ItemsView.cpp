@@ -64,7 +64,10 @@ ItemsView::ItemsView (const char *background_filename, Font *_font){
 
     f = fopen(DATA_DIR "items.txt","rb");
     if(NULL == f) {
-        throw FILE_ERROR;
+        string message("Error opening items datafile ");
+        message += DATA_DIR "items.txt";
+        //Memory leak!
+        throw ErrorMessage(FILE_ERROR,message);
     }
     while(NULL != fgets(buffer,sizeof(buffer),f)) {
         if(buffer[0] == '\0' || buffer[0] == '#' || buffer[0] == '\n') {

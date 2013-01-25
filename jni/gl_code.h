@@ -13,6 +13,8 @@
 #include <png.h>
 #include <zip.h>
 #include <map>
+#include <string>
+#include <sstream>
 #include <list>
 #include <pthread.h>
 #include <stdint.h>
@@ -86,6 +88,14 @@ enum error {
     THREAD_ERROR,
     UNINITIALISED,
     MEMORY_ERROR
+};
+
+struct ErrorMessage {
+   
+ErrorMessage(error _code,std::string _message) : message(_message),code(_code) {};
+
+    std::string message;
+    error code; 
 };
 
 enum message_types {

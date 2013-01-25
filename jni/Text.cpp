@@ -88,8 +88,10 @@ delete_texture:
     }
 exit:
     if(status != OK) {
+        string message("Error Loading font from file ");
+        message += fnt_filename;
         LOGI("Error status %d processing font file %s\n",status,fnt_filename);
-        throw status;
+        throw ErrorMessage(status,message);
     } 
 }
 

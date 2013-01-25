@@ -29,8 +29,9 @@ StatsView::StatsView (const char *background_filename, Font *_font) {
     subviews[4] = new GeneralSubView();
 
     for(int i=0;i<5;i++)
-        if(subviews[i] == NULL || boxes[i] == NULL) //fixme: memory leak
-            throw MEMORY_ERROR;
+        if(subviews[i] == NULL || boxes[i] == NULL) { //fixme: memory leak 
+            throw ErrorMessage(MEMORY_ERROR,"Memory Error initialising statsview");
+        }
 
     current_view = 0;
 
@@ -235,17 +236,22 @@ SpecialSubView::SpecialSubView() : selected_box(0.42,0.08,0.007),box(0.78,0.08,0
     FILE *f;
     error result = OK;
     int i;
+    string error_message;
 
     memcpy(descriptions,temp_desc,sizeof(descriptions));
     f = fopen(DATA_DIR "special.txt","rb");
     if(NULL == f) {
         result = FILE_NOT_FOUND;
+        error_message = "Error opening ";
+        error_message += DATA_DIR "special.txt";
         goto finish;
     }
     for(i=0;i<7;i++) {
         if(NULL == fgets(buffer,sizeof(buffer),f)) {
             //file ran out before we got all the data
             result = FILE_ERROR;
+            error_message = "Error parsing ";
+            error_message += DATA_DIR "special.txt";
             goto close_file;
         }
         stats[i] = strtoul(buffer,NULL,10);
@@ -279,6 +285,7 @@ SpecialSubView::SpecialSubView() : selected_box(0.42,0.08,0.007),box(0.78,0.08,0
         Text *t = new Text(names[i],font);
         if(NULL == t) {
             result = MEMORY_ERROR;
+            error_message = "memory_error";
             goto cleanup;
         }
         items.push_back( PlacementInfo(0.17,0.8-0.08*i,1.4,1.4,t) );
@@ -287,6 +294,7 @@ SpecialSubView::SpecialSubView() : selected_box(0.42,0.08,0.007),box(0.78,0.08,0
     for(int i=0;i<7;i++)
         if(icons[i] == NULL) {
             result = MEMORY_ERROR;
+            error_message = "memory_error";
             goto cleanup;
         }
 
@@ -309,7 +317,7 @@ close_file:
 
 finish:
     if(result != OK) {
-        throw result;
+        throw ErrorMessage(result,error_message);
     }
     
 }
@@ -399,6 +407,7 @@ SkillsSubView::SkillsSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.0
     error result = OK;
     char buffer[1024] = {0};
     int i;
+    string error_message;
 
     display_start = 0;
     display_num   = 8;
@@ -410,12 +419,16 @@ SkillsSubView::SkillsSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.0
     f = fopen(DATA_DIR "skills.txt","rb");
     if(NULL == f) {
         result = FILE_NOT_FOUND;
+        error_message = "Error opening ";
+        error_message += DATA_DIR "skills.txt";
         goto finish;
     }
     for(i=0;i<13;i++) {
         if(NULL == fgets(buffer,sizeof(buffer),f)) {
             //file ran out before we got all the data
             result = FILE_ERROR;
+            error_message = "Error parsing ";
+            error_message += DATA_DIR "skills.txt";
             goto close_file;
         }
         stats[i] = strtoul(buffer,NULL,10);
@@ -447,12 +460,14 @@ SkillsSubView::SkillsSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.0
     for(int i=0;i<13;i++)
         if(icons[i] == NULL) {
             result = MEMORY_ERROR; //memory leak fixme
+            error_message = "memory_error";
             goto cleanup;
         }
 
     scrollbar = new ScrollBar();
     if(scrollbar == NULL) {
         result = MEMORY_ERROR;
+        error_message = "memory_error";
         goto cleanup;
     }
     scrollbar->SetData(items.size(),display_start,display_num);
@@ -474,7 +489,7 @@ close_file:
 
 finish:
     if(result != OK) {
-        throw result;
+        throw ErrorMessage(result,error_message);
     }
 
 }
@@ -488,6 +503,7 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
     icons = NULL;
     names = NULL;
     descriptions = NULL;
+    string error_message;
 
     display_start = 0;
     display_num   = 8;
@@ -497,6 +513,8 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
     f = fopen(DATA_DIR "perks.txt","rb");
     if(NULL == f) {
         result = FILE_NOT_FOUND;
+        error_message = "Error opening ";
+        error_message += DATA_DIR "perks.txt";
         goto finish;
     }
     while(NULL != fgets(buffer,sizeof(buffer),f)) {
@@ -512,18 +530,21 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
     icons = (Image**)malloc(num_perks*sizeof(Image*));
     if(NULL == icons) {
         result = MEMORY_ERROR;
+        error_message = "memory_error";
         goto cleanup;
     }
     memset(icons,0,num_perks*sizeof(Image*));
     names = (const char**)malloc(num_perks*sizeof(char*));
     if(NULL == names) {
         result = MEMORY_ERROR;
+        error_message = "memory_error";
         goto cleanup;
     }
     memset(icons,0,num_perks*sizeof(char*));
     descriptions = (const char***)malloc(num_perks*sizeof(char**));
     if(NULL == descriptions) {
         result = MEMORY_ERROR;
+        error_message = "memory_error";
         goto cleanup;
     }
     memset(descriptions,0,num_perks*sizeof(char**));
@@ -532,6 +553,7 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
         descriptions[i] = (const char**)malloc(5*sizeof(char*));
         if(NULL == descriptions[i]) {
             result = MEMORY_ERROR;
+            error_message = "memory_error";
             goto cleanup;
         }
         for(j=0;j<5;j++) {
@@ -550,7 +572,13 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
         //strtok is a well known terrible function, but it's all I've got.
         names[i] = strtok_r(buffer,"|",&saveptr);
         if(NULL == names[i]) {
+            ostringstream oss;
+            oss << num_perks;
             result = FILE_ERROR;
+            error_message = "Error parsing ";
+            error_message += DATA_DIR "perks.txt";
+            error_message += "On perk";
+            error_message += oss.str();
             goto cleanup;
         }
         LOGI("perks*** : Perk[%d] : %s",i,names[i]);
@@ -558,12 +586,19 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
         names[i] = strdup(names[i]);
         char *filename = strtok_r(NULL,"|",&saveptr);
         if(NULL == filename) {
+            ostringstream oss;
+            oss << num_perks;
             result = FILE_ERROR;
+            error_message = "Error parsing ";
+            error_message += DATA_DIR "perks.txt";
+            error_message += "On perk";
+            error_message += oss.str();
             goto cleanup;
         }
         icons[i] = new Image(filename,480./800,1.0,standard_tex_coords);
         if(NULL == icons[i]) {
             result = MEMORY_ERROR;
+            error_message = "memory_error";
             goto cleanup;
         }
         for(j=0;j<5;j++) {
@@ -591,6 +626,7 @@ PerksSubView::PerksSubView() : selected_box(0.46,0.08,0.007),box(0.78,0.08,0.007
     scrollbar = new ScrollBar();
     if(scrollbar == NULL) {
         result = MEMORY_ERROR;
+        error_message = "memory_error";
         goto cleanup;
     }
     scrollbar->SetData(items.size(),display_start,display_num);
@@ -628,7 +664,7 @@ close_file:
 
 finish:
     if(result != OK) {
-        throw result;
+        throw ErrorMessage(result,error_message);
     }
 }
 
@@ -660,7 +696,7 @@ GeneralSubView::GeneralSubView() : selected_box(0.46,0.08,0.007) {
 
     icon = new Image("reputations_novac.png",480./800,1.0,standard_tex_coords);
     if(icon == NULL)
-        throw MEMORY_ERROR;
+        throw ErrorMessage(MEMORY_ERROR,"memory error");
 
     items.push_back( PlacementInfo(0.17,0.8,1.4,1.4,new Text("Everyone",font)) );
     items.push_back( PlacementInfo(0.135,0.778,1.4,1.4,&selected_box) );
