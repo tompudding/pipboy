@@ -97,6 +97,7 @@ ItemsView::ItemsView (const char *background_filename, Font *_font){
               data[17][i] == '\r' || 
               data[17][i] == '\t') {
             data[17][i] = '\0';
+            i--;
         }
 
         itemdata.type                    = type_from_string(data[0]);
