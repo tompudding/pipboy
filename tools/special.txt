@@ -1,0 +1,7 @@
+5 #strength
+3 #perception
+4 #endurance
+4 #charisma
+10 #intelligence
+5 #agility
+5 #luck

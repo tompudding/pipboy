@@ -1,0 +1,13 @@
+35 #barter
+0 #energy weapons
+0 #explosives
+3 #guns
+4 #lockpick
+7 #medicine
+25 #melee weapons
+40 #repair
+100 #science
+27 #sneak
+40 #speech
+23 #survival
+20 #unarmed

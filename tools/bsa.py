@@ -1,4 +1,9 @@
-import os,struct,binascii,zlib
+import os
+import struct
+import binascii
+import zlib
+import tempfile
+import glob
 
 class Error(Exception):
     pass
@@ -60,7 +65,7 @@ class FileRecord(object):
             assert len(decomp) == decompress_size
             return decomp
         else:
-            raise NotDoneYet
+            return self.f.read(self.size)
 
 class BSAFile(object):
     def __init__(self,filename):
@@ -115,16 +120,8 @@ class BSAFile(object):
             self.file_records[hs].name = file_name
             count += 1
 
-if __name__ == '__main__':
-    import sys
-    import cStringIO as StringIO
-    import Image
-    import DDSImageFile
-    import dds
-    import zipfile
-    import re
-
-    essential = set(('special_luck.dds'          ,
+#bit of a waste declaring this every time
+essential_dds = set(('special_luck.dds'          ,
                      'special_intelligence.dds'  ,
                      'special_endurance.dds'     ,
                      'special_strength.dds'      ,
@@ -145,7 +142,7 @@ if __name__ == '__main__':
                      'skills_unarmed.dds'        ,
                      'monofonto_verylarge02_dialogs2_0_lod_a.dds'))
 
-    other_wanted = set(('power_armor.dds' ,
+other_wanted_dds = set(('power_armor.dds' ,
                         'right_leg.dds'   ,
                         'right_arm.dds'   ,
                         'torso.dds'       ,
@@ -158,31 +155,202 @@ if __name__ == '__main__':
                         'right.dds'       ,
                         'monofonto_verylarge02_dialogs2_0_lod_a.dds'))
 
-    #start the output zipfile
-    with zipfile.ZipFile(sys.argv[2],'w') as output_zip:
-        bsa = BSAFile(sys.argv[1])
-        out = sys.argv[2]
-        #print bsa.version
-        for file_record in bsa.file_records.values():
-            print file_record.name
-            if re.match('(perk|special|reputations|skills|weap|weapons|vault_suit|item|items|apperal|appearal|apparel|missile)_.*\.dds',file_record.name) or file_record.name in other_wanted:
-                data = file_record.read()
-                data_file = StringIO.StringIO(data)
-                im = Image.open(data_file)
-                png_data = StringIO.StringIO()
-                im.save(png_data,format = 'PNG')
-                png_data = png_data.getvalue()
-                new_name = file_record.name.replace('.dds','.png')
-                output_zip.writestr(new_name,png_data)
-                print file_record.name,len(png_data)
+
+def HandleDDS(file_name,extension,file_record,output_zip):
+
+    zip_path = ''
+    if file_record.name in other_wanted_dds:
+        zip_path = ''
+        match = True
+    else:
+        match = re.match('(perk|special|reputations|skills|weap_skill|weapons|vault_suit|item|items|apperal|appearal|apparel|missile)_.*\.dds',file_record.name)
+        if not match:
+            return
+        if match.groups()[0] in items_prefix:
+            zip_path = 'icons'
+        else:
+            zip_path = ''
+    if match:
+        data = file_record.read()
+        data_file = StringIO.StringIO(data)
+        im = Image.open(data_file)
+        png_data = StringIO.StringIO()
+        im.save(png_data,format = 'PNG')
+        png_data = png_data.getvalue()
+        new_name = os.path.join(zip_path,file_name + '.png')
+        output_zip.writestr(new_name,png_data)
+        print file_record.name,len(png_data)
+        try:
+            essential_dds.remove(file_record.name)
+        except KeyError:
+            pass
+
+music_files = []
+    
+def HandleMusic(file_name,extension,file_record,output_zip):
+    if not file_name.startswith('mus_'):
+        return
+    print 'music file!',file_name,extension
+    inputf = tempfile.NamedTemporaryFile(mode='wb', delete=False)
+    inputf.write(file_record.read())
+    inputf.flush()
+    inputf.close()
+    try:
+        outputf = tempfile.NamedTemporaryFile(mode='wb', delete=False)
+        outputf.close()
+        try:
+            song = AudioSegment.from_file(inputf.name,extension[1:])
+            song = song.set_channels(1)
+            song = song.set_frame_rate(22050)
+            song.export(outputf.name,'s16le',codec = 'pcm_s16le')
+            zip_path = os.path.join('music',file_name + '.snd')
+            output_zip.write(outputf.name,zip_path)
+            music_files.append(zip_path)
+        finally:
+            os.unlink(outputf.name)
+    finally:
+        os.unlink(inputf.name)
+
+wavmap = {'ui_pipboy_tab'          : ['menu_tab'],
+          'ui_pipboy_mode'         : ['mode_change'],
+          'ui_menu_prevnext'       : ['menu_prevnext'],
+          'wpn_pistol10mm_equip'   : ['equip_weapon'],
+          'ui_pipboy_select'       : ['select_sound'],
+          'wpn_pistol10mm_unequip' : ['unequip_weapon'],
+          'ui_pipboy_access_up'    : ['equip_misc','equip_apparel','unequip_apparel'],
+          'ui_pipboy_access_down'  : ['equip_aid']}
+
+essential_sounds = set()
+for name_list in wavmap.values():
+    for name in name_list:
+        essential_sounds.add(name + '.snd')
+
+for tag in 'cd':
+    for num in xrange(1,6):
+        essential_sounds.add('ui_static_%s_%02d.wav.snd' % (tag,num))
+          
+def HandleWav(file_name,extension,file_record,output_zip):
+    try:
+        output_file_names = wavmap[file_name]
+    except:
+        if 'ui_static_' not in file_name:
+            return
+        #note this is including the original extension, so the zip file will have 2 extensions
+        #this is on purpose for some reason
+        output_file_names = [file_record.name]
+    inputf = tempfile.NamedTemporaryFile(mode='wb', delete=False)
+    inputf.write(file_record.read())
+    inputf.flush()
+    inputf.close()
+    try:
+        outputf = tempfile.NamedTemporaryFile(mode='wb', delete=False)
+        outputf.close()
+        try:
+            song = AudioSegment.from_file(inputf.name,extension[1:])
+            song = song.set_channels(1)
+            song = song.set_frame_rate(22050)
+            song.export(outputf.name,'s16le',codec = 'pcm_s16le')
+            for output_file_name in output_file_names:
+                target = output_file_name + '.snd'
                 try:
-                    essential.remove(file_record.name)
+                    essential_sounds.remove(target)
                 except KeyError:
                     pass
-                #print im
-                #with open(out,'wb') as f:
-                #    f.write(data)
-                #raise SystemExit
+                output_zip.write(outputf.name,os.path.join('sounds',target))
+        finally:
+            os.unlink(outputf.name)
+    finally:
+        os.unlink(inputf.name)
 
-    for item in essential:
-        print 'missing',item
+found_font = False
+def HandleFnt(file_name,extension,file_record,output_zip):
+    global found_font
+    if 'monofonto_verylarge02_dialogs2' not in file_name:
+        return
+    output_zip.writestr('monofonto_verylarge02_dialogs2.fnt',file_record.read())
+    found_font = True
+
+def AddCustomItems(zip_file):
+    for filename in ('items_bg.png',
+                     'data_bg.png',
+                     'box.png',
+                     'bar.png',
+                     'band.png',
+                     'stats_bg.png',
+                     'scanline.png',
+                     'full.png',
+                     'fade.png'):
+        zip_file.write(filename,filename)
+    
+
+if __name__ == '__main__':
+    import sys
+    import cStringIO as StringIO
+    import Image
+    import DDSImageFile
+    import dds
+    import zipfile
+    import re
+    from pydub import AudioSegment
+
+
+    items_prefix = set(('weapons',
+                        'vault_suit',
+                        'item',
+                        'items',
+                        'apperal',
+                        'appearal',
+                        'apparel',
+                        'missile'))
+
+    handlers = {'.dds' : HandleDDS,
+                '.mp3' : HandleMusic,
+                '.ogg' : HandleMusic,
+                '.wav' : HandleWav,
+                '.fnt' : HandleFnt}
+
+    if len(sys.argv) < 3:
+        print 'Usage: %s output_dir [list of input dirs]' % sys.argv[0]
+        raise SystemExit
+
+    target_dir = sys.argv[1]
+    if not os.path.isdir(target_dir):
+        print '%s is not a directory' % sys.argv[1]
+        raise SystemExit
+
+    for filename in ('perks.txt','special.txt','skills.txt','items.txt'):
+        #set up the default lists
+        with open(filename,'rb') as inf:
+            with open(os.path.join(target_dir,filename),'wb') as outf:
+                outf.write(inf.read())
+
+    #start the output zipfile
+    with zipfile.ZipFile(os.path.join(target_dir,'data.zip'),'w') as output_zip:
+        AddCustomItems(output_zip)
+        for input_dir in sys.argv[2:]:
+            for bsa_filename in glob.glob(os.path.join(input_dir,'*.bsa')):
+                bsa = BSAFile(bsa_filename)
+                print 'processing',bsa_filename
+                #print bsa.version
+                for file_record in bsa.file_records.values():
+                    file_name,extension = os.path.splitext(file_record.name)
+                    #print file_name,extension
+                    try:
+                        handlers[extension](file_name,extension,file_record,output_zip)
+                    except KeyError:
+                        #print 'Ignoring file',file_name
+                        pass
+
+        for item in essential_dds:
+            output_zip.write('full.png',item)
+
+        for item in essential_sounds:
+            output_zip.writestr(os.path.join('sounds',item),'\x00\x00')
+
+    if not found_font:
+        print 'Failed to find font, is your fallout installation complete?'
+        raise SystemExit
+        
+    with open(os.path.join(target_dir,'music.txt'),'wb') as f:
+        for song in music_files:
+            f.write('{name}|{name}\n'.format(name = os.path.basename(song)))
