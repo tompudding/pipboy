@@ -140,6 +140,7 @@ essential_dds = set(('special_luck.dds'          ,
                      'skills_speech.dds'         ,
                      'skills_survival.dds'       ,
                      'skills_unarmed.dds'        ,
+                     'screenglare.dds'           ,
                      'monofonto_verylarge02_dialogs2_0_lod_a.dds'))
 
 other_wanted_dds = set(('power_armor.dds' ,
@@ -153,8 +154,26 @@ other_wanted_dds = set(('power_armor.dds' ,
                         'backward.dds'    ,
                         'left.dds'        ,
                         'right.dds'       ,
+                        'screenglare.dds' ,
                         'monofonto_verylarge02_dialogs2_0_lod_a.dds'))
 
+def screenglare_filter(im):
+    #the screenglare needs converting so black becomes completely transparent,
+    #and white is opaque
+    inpix = im.getdata()
+    out = Image.new('RGBA',im.size)
+    outpix = out.load()
+    print im,outpix
+    w,h = im.size
+    for x in xrange(w):
+        for y in xrange(h):
+            r,g,b = inpix[y*im.size[0] + x]
+            z = float(max((r,g,b)))
+            if z == 0:
+                outpix[(x,y)] = (0,0,0,0)
+            else:
+                outpix[(x,y)] = (int((r/z)*255),int((g/z)*255),int((b/z)*255),int(z))
+    return out
 
 def HandleDDS(file_name,extension,file_record,output_zip):
 
@@ -174,6 +193,9 @@ def HandleDDS(file_name,extension,file_record,output_zip):
         data = file_record.read()
         data_file = StringIO.StringIO(data)
         im = Image.open(data_file)
+        if 'screenglare' in file_record.name:
+            im = screenglare_filter(im)
+            file_name = 'screenglare_alpha'
         png_data = StringIO.StringIO()
         im.save(png_data,format = 'PNG')
         png_data = png_data.getvalue()
@@ -342,7 +364,7 @@ if __name__ == '__main__':
                         pass
 
         for item in essential_dds:
-            output_zip.write('full.png',item)
+            output_zip.write('full.png',os.path.splitext(item)[0] + '.png')
 
         for item in essential_sounds:
             output_zip.writestr(os.path.join('sounds',item),'\x00\x00')
