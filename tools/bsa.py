@@ -121,41 +121,52 @@ class BSAFile(object):
             count += 1
 
 #bit of a waste declaring this every time
-essential_dds = set(('special_luck.dds'          ,
-                     'special_intelligence.dds'  ,
-                     'special_endurance.dds'     ,
-                     'special_strength.dds'      ,
-                     'special_perception.dds'    ,
-                     'special_charisma.dds'      ,
-                     'special_agility.dds'       ,
-                     'skills_barter.dds'         ,
-                     'skills_energy_weapons.dds' ,
-                     'skills_small_guns.dds'     ,
-                     'skills_lockpick.dds'       ,
-                     'skills_medicine.dds'       ,
-                     'skills_melee_weapons.dds'  ,
-                     'skills_repair.dds'         ,
-                     'skills_science.dds'        ,
-                     'skills_sneak.dds'          ,
-                     'skills_speech.dds'         ,
-                     'skills_survival.dds'       ,
-                     'skills_unarmed.dds'        ,
-                     'screenglare.dds'           ,
-                     'monofonto_verylarge02_dialogs2_0_lod_a.dds'))
+essential_dds = set(('special_luck.dds'                           ,
+                     'special_intelligence.dds'                   ,
+                     'special_endurance.dds'                      ,
+                     'special_strength.dds'                       ,
+                     'special_perception.dds'                     ,
+                     'special_charisma.dds'                       ,
+                     'special_agility.dds'                        ,
+                     'skills_barter.dds'                          ,
+                     'skills_energy_weapons.dds'                  ,
+                     'skills_small_guns.dds'                      ,
+                     'skills_lockpick.dds'                        ,
+                     'skills_medicine.dds'                        ,
+                     'skills_melee_weapons.dds'                   ,
+                     'skills_repair.dds'                          ,
+                     'skills_science.dds'                         ,
+                     'skills_sneak.dds'                           ,
+                     'skills_speech.dds'                          ,
+                     'skills_survival.dds'                        ,
+                     'skills_unarmed.dds'                         ,
+                     'screenglare.dds'                            ,
+                     'monofonto_verylarge02_dialogs2_0_lod_a.dds' ,
+                     'power_armor.dds'                            ,
+                     'right_leg.dds'                              ,
+                     'right_arm.dds'                              ,
+                     'torso.dds'                                  ,
+                     'head.dds'                                   ,
+                     'face.dds'                                   ,
+                     'wave.dds'                                   ,
+                     'chevrons.dds'                               ,
+                     'chevrons1.dds'                              ,
+                     'left_leg.dds'                               ,
+                     'left_arm.dds'                               ,
+                     'forward.dds'                                ,
+                     'backward.dds'                               ,
+                     'left.dds'                                   ,
+                     'right.dds'                                  ,
+                     'weap_skill_icon_explosives.dds'             ,
+                     'weap_skill_icon_energy.dds'                 ,
+                     'weap_skill_icon_big_guns.dds'               ,
+                     'weap_skill_icon_unarmed.dds'                ,
+                     'weap_skill_icon_sm_arms.dds'                ,
+                     'reputations_novac.dds'                      ,
+                     'item_antivenom.dds'                         ,
+                     'lincolnrifleammo.dds'                       ,
+                     'weap_skill_icon_melee.dds'                  ))
 
-other_wanted_dds = set(('power_armor.dds' ,
-                        'right_leg.dds'   ,
-                        'right_arm.dds'   ,
-                        'torso.dds'       ,
-                        'head.dds'        ,
-                        'left_leg.dds'    ,
-                        'left_arm.dds'    ,
-                        'forward.dds'     ,
-                        'backward.dds'    ,
-                        'left.dds'        ,
-                        'right.dds'       ,
-                        'screenglare.dds' ,
-                        'monofonto_verylarge02_dialogs2_0_lod_a.dds'))
 
 def screenglare_filter(im):
     #the screenglare needs converting so black becomes completely transparent,
@@ -178,7 +189,7 @@ def screenglare_filter(im):
 def HandleDDS(file_name,extension,file_record,output_zip):
 
     zip_path = ''
-    if file_record.name in other_wanted_dds:
+    if file_record.name in essential_dds:
         zip_path = ''
         match = True
     else:
@@ -196,6 +207,11 @@ def HandleDDS(file_name,extension,file_record,output_zip):
         if 'screenglare' in file_record.name:
             im = screenglare_filter(im)
             file_name = 'screenglare_alpha'
+        if 'monofonto_verylarge' in file_record.name:
+            file_name = 'monofonto_verylarge02_dialogs2'
+        if 'lincolnrifle' in file_record.name:
+            zip_path = 'icons'
+            file_name = 'items__308_ammo'
         png_data = StringIO.StringIO()
         im.save(png_data,format = 'PNG')
         png_data = png_data.getvalue()
@@ -357,6 +373,7 @@ if __name__ == '__main__':
                 for file_record in bsa.file_records.values():
                     file_name,extension = os.path.splitext(file_record.name)
                     #print file_name,extension
+                    #continue
                     try:
                         handlers[extension](file_name,extension,file_record,output_zip)
                     except KeyError:
@@ -364,6 +381,12 @@ if __name__ == '__main__':
                         pass
 
         for item in essential_dds:
+            match = re.match('(perk|special|reputations|skills|weapons|vault_suit|item|items|apperal|appearal|apparel|missile)_.*\.dds',item)
+            if match and match.groups()[0] in items_prefix:
+                item = os.path.join('icons',item )
+            if 'lincolnrifle' in item:
+                if any('items_308_ammo' in t for t in output_zip.namelist()):
+                    continue
             output_zip.write('full.png',os.path.splitext(item)[0] + '.png')
 
         for item in essential_sounds:

@@ -1,13 +1,13 @@
-Amazing Beard|perk_life_giver.png|Your beard strikes fear into the|heart of your opponents, and|opens up new dialogue options. It|also absorbs 90% of all damage||
-Captain Awesome|perk_action_boy.png|All know of your legendary|awesomeness. The higher an enemy's|intelligence, the more likely they|are to run away from you|
+#Amazing Beard|perk_life_giver.png|Your beard strikes fear into the|heart of your opponents, and|opens up new dialogue options. It|also absorbs 90% of all damage||
+#Captain Awesome|perk_action_boy.png|All know of your legendary|awesomeness. The higher an enemy's|intelligence, the more likely they|are to run away from you|
 Chemist|perk_chemist.png|Chems last twice as long||||
 Comprehension|perk_comprehension.png|You gain one additional skill|point for reading books and double|the skill points for reading|magazines.||
-Computer Whizz|perk_l33t_haxx0r.png|Can hack a locked down |terminal with four more|chances.|||
-Costume Guy|perk_robotics_expert.png|Costumes with electronic|components can be constructed|200% faster|||
+Computer Whizz|perk_l33t haxx0r.png|Can hack a locked down |terminal with four more|chances.|||
+Costume Guy|perk_robotics expert.png|Costumes with electronic|components can be constructed|200% faster|||
 Educated|perk_educated.png|With the Educated perk, you gain|two more skill points every time|you advance in level. This perk is|best taken early on, to maximise|its effectiveness|
-Four Eyes|perk_four_eyes.png|While wearing any type of|glasses, you have +1 PER. Without|glasses, you have -1 PER|||
-Math Wrath|perk_math_wrath.png|You are able to optimize your|Pip-Boy's V.A.T.S logic, reducing|all AP costs by 10%|||
-Nerd Rage|perk_nerd_rage!.png|+15 DT and Strength increased to|10 whenever health is 20% or|lower.|||
-Swift Learner|perk_swift_learner.png|With each rank in the Swift|Learner perk, you gain an|additional 10% to total|Experience Points whenever|Experience Points are earned.|
-Travel Light|perk_travel_light.png|While wearing light armor or|no armor, you run 10% faster.||||
-The Award Winning|perk_challenge.png|Numerous prestigious awards|have given you spectacular|superpowers. Speech is set|to 100% for interlocutors with|intelligence less than 4.|
+#Four Eyes|perk_four_eyes.png|While wearing any type of|glasses, you have +1 PER. Without|glasses, you have -1 PER|||
+#Math Wrath|perk_math_wrath.png|You are able to optimize your|Pip-Boy's V.A.T.S logic, reducing|all AP costs by 10%|||
+Nerd Rage|perk_nerd rage!.png|+15 DT and Strength increased to|10 whenever health is 20% or|lower.|||
+Swift Learner|perk_swift learner.png|With each rank in the Swift|Learner perk, you gain an|additional 10% to total|Experience Points whenever|Experience Points are earned.|
+#Travel Light|perk_travel_light.png|While wearing light armor or|no armor, you run 10% faster.||||
+#The Award Winning|perk_challenge.png|Numerous prestigious awards|have given you spectacular|superpowers. Speech is set|to 100% for interlocutors with|intelligence less than 4.|
