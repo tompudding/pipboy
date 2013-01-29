@@ -44,6 +44,7 @@ void ImagePtr::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
 
 Image::~Image() {
     if(data != NULL) {
+        LOGI("Deleting %p\n",data);
         delete[] data;
     }
     if(fname != NULL) {
@@ -215,6 +216,7 @@ void Image::Load() {
         status = MEMORY_ERROR;
         goto free_data;
     }
+    LOGI("File %s allocated in %p\n",fname,data);
     //row_pointers is for pointing to image_data for reading the png with libpng
     row_pointers = new png_bytep[theight];
     if (NULL == row_pointers) {
@@ -233,7 +235,7 @@ void Image::Load() {
     memcpy(mIndexBuffer,indicies,sizeof(mIndexBuffer));
 
 free_data:
-    if(status != OK and NULL != data) {
+    if(status != OK && NULL != data) {
         delete[] data;
         data = NULL;
     }
@@ -259,8 +261,9 @@ void Image::RefreshTexture() {
     if(!loaded) {
         return;
     }
+    LOGE("Refreshing texture:%s %d:%d:%p:%d",fname,file_width,file_height,data,0);
     texture = GenTexture(file_width,file_height,data);
-    LOGE("Refreshing texture:%s %d:%d:%p:%d",fname,file_width,file_height,data,texture);
+    
 }
 
 void Image::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {

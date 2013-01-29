@@ -5,16 +5,20 @@
 
 std::list<SoundClip*> sound_list;
 
-void LoadSoundFile(const char *filename,short **buffer,size_t *size) {
+void LoadSoundFile(const char *prefix,const char *filename,short **buffer,size_t *size) {
     //FILE *data = NULL;
     struct zip_stat st = {0};
     zip_file    *file         = NULL;
     zip         *z            = NULL;
-    char temp_path[1024] = "sounds/";
+    char temp_path[1024]      = {0};
     error status = OK;
     int err;
-    
-    strncat(temp_path,filename,sizeof(temp_path) - strlen(temp_path));
+
+    if(sizeof(temp_path) <= snprintf(temp_path,sizeof(temp_path),"%s/%s",prefix,filename)) {
+        status = MEMORY_ERROR;
+        goto exit;
+    }
+    temp_path[sizeof(temp_path)-1] = 0;
     
     z = zip_open(DATA_DIR ZIP_FILENAME, 0, &err);
     if(NULL == z) {
@@ -96,14 +100,27 @@ exit:
 
 SoundClip::SoundClip(const char *filename) {
     fname = strdup(filename);
+    prefix = "sounds";
     loaded = false;
+    size = 1;
     //size = GetSizeSound(filename);
 
     sound_list.push_back(this); //can I do this?
 }
 
+MusicFile::MusicFile(const char *filename) {
+    fname = strdup(filename);
+    prefix = "music";
+    loaded = false;
+    size = 1;
+    //size = GetSizeSound(filename);
+
+    sound_list.push_back(this); //can I do this?
+}
+
+
 void SoundClip::Load() {
-    LoadSoundFile(fname,&buffer,&size);
+    LoadSoundFile(prefix,fname,&buffer,&size);
     loaded = true;
 }
 
@@ -125,12 +142,13 @@ void SoundClip::GetBuffer(short **out,size_t *outs) {
 }
 
 RandomSoundClip::RandomSoundClip(char **filename) {
-    buffer = NULL;
-    size   = NULL;
-    count = 0;
-    loaded = false;
+    buffer     = NULL;
+    size       = NULL;
+    count      = 0;
+    loaded     = false;
+    prefix     = "sounds";
     total_size = 0;
-    int i = 0;
+    int i      = 0;
     //make a copy of the filenames for later loading
     for(char **p = filename; *p; p++)
         count++;
@@ -140,7 +158,8 @@ RandomSoundClip::RandomSoundClip(char **filename) {
     }
     for(char **p = filename; *p; p++,i++) {
         filenames[i] = strdup(*p);
-        total_size  += GetSizeSound(*p);
+        //total_size  += GetSizeSound(*p);
+        total_size += 1;
     }
 
     sound_list.push_back(this); //can I do this?
@@ -169,7 +188,7 @@ void RandomSoundClip::Load() {
         memset(size,0,sizeof(size_t)*count);
         int i = 0;
         for(i=0;i<count;i++) {
-            LoadSoundFile(filenames[i],&(buffer[i]),&(size[i]));
+            LoadSoundFile(prefix,filenames[i],&(buffer[i]),&(size[i]));
         }
         loaded = true;
     }

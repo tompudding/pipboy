@@ -92,10 +92,10 @@ ItemsView::ItemsView (const char *background_filename, Font *_font){
         }
         //remove the newline from the end of the last item
         i = strlen(data[17]) - 1;
-        while(data[17][i] == ' '  || 
-              data[17][i] == '\n' || 
-              data[17][i] == '\r' || 
-              data[17][i] == '\t') {
+        while(i > 0 && (data[17][i] == ' '  || 
+                        data[17][i] == '\n' || 
+                        data[17][i] == '\r' || 
+                        data[17][i] == '\t')) {
             data[17][i] = '\0';
             i--;
         }

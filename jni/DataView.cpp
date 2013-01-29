@@ -5,11 +5,63 @@ DataView::DataView (const char *background_filename, Font *_font) {
     struct tm stm;
     time_t t;
     char temp[128];
+    FILE *f;
+    char buffer[1024] = {0};
+    string error_message;
+    error result = OK;
+    int i;
+    int code = 0;
     pthread_mutex_init(&items_mutex,NULL);
     font = _font;
-
     lists[0] = new ItemList(&equipped);
     lists[1] = new ItemList(&equipped);
+
+    f = fopen(DATA_DIR "music.txt","rb");
+    if(NULL == f) {
+        result = FILE_NOT_FOUND;
+        error_message = "Error opening ";
+        error_message += DATA_DIR "music.txt";
+        throw ErrorMessage(result,error_message);
+    }
+    //The rest of this code doesn't catch bad_alloc or check for failed allocations.
+    //Problems all around
+    while(NULL != fgets(buffer,sizeof(buffer),f)) {
+    //do a first pass to establish how many perks we're doing
+        if(buffer[0] == '\0' || buffer[0] == '#' || buffer[0] == '\n') {
+            continue;
+        }
+        char *data[2] = {0};
+        char *saveptr = NULL;
+        ItemData itemdata = {(ItemType)0};
+        data[0] = strtok_r(buffer,"|",&saveptr);
+        if(data[0] == NULL) {
+            continue;
+        }
+        
+        data[1] = strtok_r(NULL,"|",&saveptr);
+        if(data[1] == NULL) {
+            continue;
+        }
+
+        //remove the newline from the end of the last item
+        i = strlen(data[1]) - 1;
+        while(i > 0 && (data[1][i] == ' '  || 
+                        data[1][i] == '\n' || 
+                        data[1][i] == '\r' || 
+                        data[1][i] == '\t')) {
+                  data[1][i] = '\0';
+                  i--;
+              }
+
+        itemdata.type                    = RADIO;
+        itemdata.code                    = (ItemCode)code++; //sort of cheat here
+        itemdata.name                    = data[0];
+        itemdata.filename                = data[1];
+
+        lists[0]->AddItem(new RadioItem(&itemdata,_font));
+    }
+
+   
     current_list = 0;
 
     boxes[0] = new PlacementInfo(0.29,0.005,1,1, new Box(0.210,0.08,0.007));
@@ -18,47 +70,7 @@ DataView::DataView (const char *background_filename, Font *_font) {
     waves[0] = left     = new Image(    "left.png",0.63*(480./800),0.482,standard_tex_coords);
     waves[1] = forward  = new Image( "forward.png",0.63*(480./800),0.482,standard_tex_coords);
     waves[2] = backward = new Image("backward.png",0.63*(480./800),0.482,standard_tex_coords);
-    waves[3] = wave     = new Image(    "wave.png",0.63*(480./800),0.482,standard_tex_coords);
-
-    /*ItemCode panel_codes[] = {PANEL_BATTLESTAR,
-                              PANEL_GAMEOFTHRONES ,
-                              PANEL_SHOWTIME ,
-                              PANEL_DRHORRIBLE ,
-                              PANEL_CAPTAINS ,
-                              PANEL_VENTUREBROS ,
-                              PANEL_THERIVER ,
-                              PANEL_WAREHOUSE13 ,
-                              PANEL_TRUEBLOOD ,
-                              PANEL_TRS ,
-                              PANEL_LOCKEANDKEY ,
-                              PANEL_COMMUNITY ,
-                              PANEL_JOSS ,
-                              PANEL_GRIMM ,
-                              PANEL_FRINGE ,
-                              PANEL_ALCATRAZ ,
-                              PANEL_PERSONOFINTEREST ,
-                              PANEL_MYTHBUSTERS ,
-                              PANEL_MASQ ,
-                              PANEL_YOUNGJUSTICE ,
-                              };*/
-    ItemCode radio_codes[] = {RADIO_BIG_IRON,
-                              RADIO_DO_RIGHT,
-                              RADIO_AMERICAN_SWING,
-                              RADIO_GENERIC_SWING,
-                              RADIO_SUNNING,
-                              RADIO_JOLLY,
-                              RADIO_CIV,
-                              RADIO_WAYBACK,
-                              RADIO_MIGHTY,
-                              RADIO_IDONT,
-                              RADIO_GUY,
-                              RADIO_BUTCHER
-    };
-                           
-
-    for(int i=0;i<sizeof(radio_codes)/sizeof(radio_codes[0]);i++) {
-        lists[0]->AddItem(ItemFactory(item_map[radio_codes[i]],_font));
-    }
+    waves[3] = wave     = new Image(    "wave.png",0.63*(480./800),0.482,standard_tex_coords);           
     
     
     t = time(NULL);
@@ -172,7 +184,7 @@ RadioItem::RadioItem(const ItemData *data,Font *font) : Item(data,font),box(0.5,
     type = data->type;
 
     LOGI("Trying to open radio sound %s",data->filename);
-    clip = new SoundClip(data->filename);
+    clip = new MusicFile(data->filename);
     text = new Text(name,font);
 }
 

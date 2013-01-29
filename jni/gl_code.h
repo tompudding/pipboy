@@ -141,10 +141,18 @@ public:
     short *buffer;
     size_t size;
     char *fname;
+    const char *prefix;
     bool loaded;
 };
 
-class RandomSoundClip : public SoundClip{
+class MusicFile : public SoundClip {
+public:
+    MusicFile(const char *filename);
+
+    //const char *prefix;
+};
+
+class RandomSoundClip : public SoundClip {
 public:
     RandomSoundClip(char **filename);
     ~RandomSoundClip();
