@@ -165,6 +165,7 @@ essential_dds = set(('special_luck.dds'                           ,
                      'reputations_novac.dds'                      ,
                      'item_antivenom.dds'                         ,
                      'lincolnrifleammo.dds'                       ,
+                     'face_00.dds'                                ,
                      'weap_skill_icon_melee.dds'                  ))
 
 
@@ -202,6 +203,7 @@ def HandleDDS(file_name,extension,file_record,output_zip):
             zip_path = ''
     if match:
         data = file_record.read()
+        print 'x',len(data)
         data_file = StringIO.StringIO(data)
         im = Image.open(data_file)
         if 'screenglare' in file_record.name:
@@ -212,6 +214,8 @@ def HandleDDS(file_name,extension,file_record,output_zip):
         if 'lincolnrifle' in file_record.name:
             zip_path = 'icons'
             file_name = 'items__308_ammo'
+        if 'face_00' in file_record.name:
+            file_name = 'face'
         png_data = StringIO.StringIO()
         im.save(png_data,format = 'PNG')
         png_data = png_data.getvalue()
@@ -315,6 +319,8 @@ def AddCustomItems(zip_file):
                      'bar.png',
                      'band.png',
                      'stats_bg.png',
+                     'chevrons.png',
+                     'chevrons1.png',
                      'scanline.png',
                      'full.png',
                      'fade.png'):
@@ -373,7 +379,8 @@ if __name__ == '__main__':
                 for file_record in bsa.file_records.values():
                     file_name,extension = os.path.splitext(file_record.name)
                     #print file_name,extension
-                    #continue
+                    if 'monofonto' not in file_name:
+                        continue
                     try:
                         handlers[extension](file_name,extension,file_record,output_zip)
                     except KeyError:
