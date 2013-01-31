@@ -724,7 +724,7 @@ public:
     Font *font;
     Image *background;
     Image *left,*forward,*backward,*wave;
-    Image *waves[4];
+    Image *waves[3];
     size_t current_list;
     ItemList *panels;
     ItemList *lists[2];

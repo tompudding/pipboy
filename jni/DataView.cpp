@@ -67,10 +67,10 @@ DataView::DataView (const char *background_filename, Font *_font) {
     boxes[0] = new PlacementInfo(0.29,0.005,1,1, new Box(0.210,0.08,0.007));
     boxes[1] = new PlacementInfo(0.293,0.005,1,1, new Box(0.205,0.08,0.007));
 
-    waves[0] = left     = new Image(    "left.png",0.63*(480./800),0.482,standard_tex_coords);
-    waves[1] = forward  = new Image( "forward.png",0.63*(480./800),0.482,standard_tex_coords);
-    waves[2] = backward = new Image("backward.png",0.63*(480./800),0.482,standard_tex_coords);
-    waves[3] = wave     = new Image(    "wave.png",0.63*(480./800),0.482,standard_tex_coords);           
+    //waves[0] = left     = new Image(    "left.png",0.63*(480./800),0.482,standard_tex_coords);
+    waves[0] = forward  = new Image( "forward.png",0.63*(480./800),0.482,standard_tex_coords);
+    waves[1] = backward = new Image("backward.png",0.63*(480./800),0.482,standard_tex_coords);
+    waves[2] = wave     = new Image(    "wave.png",0.63*(480./800),0.482,standard_tex_coords);           
     
     
     t = time(NULL);
@@ -132,11 +132,11 @@ void DataView::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {
         //chosen_int = (milliseconds%6000)/1500;
         if(milliseconds - last_change > 1500) {
             last_change = milliseconds;
-            chosen_int = lrand48()&0x3;
+            chosen_int = lrand48()%3;
         }
         pos = ((GLfloat)(milliseconds%500UL))/500UL;
         float limit = 1;
-        if(chosen_int == 3) {
+        if(chosen_int == 2) {
             limit /= 4;
             pos = ((GLfloat)(milliseconds%2000UL))/2000UL;
         }

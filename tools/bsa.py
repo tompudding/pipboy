@@ -147,15 +147,12 @@ essential_dds = set(('special_luck.dds'                           ,
                      'right_arm.dds'                              ,
                      'torso.dds'                                  ,
                      'head.dds'                                   ,
-                     'face.dds'                                   ,
                      'wave.dds'                                   ,
-                     'chevrons.dds'                               ,
-                     'chevrons1.dds'                              ,
                      'left_leg.dds'                               ,
                      'left_arm.dds'                               ,
                      'forward.dds'                                ,
                      'backward.dds'                               ,
-                     'left.dds'                                   ,
+                     #'left.dds'                                   ,
                      'right.dds'                                  ,
                      'weap_skill_icon_explosives.dds'             ,
                      'weap_skill_icon_energy.dds'                 ,
@@ -186,6 +183,20 @@ def screenglare_filter(im):
             else:
                 outpix[(x,y)] = (int((r/z)*255),int((g/z)*255),int((b/z)*255),int(z))
     return out
+
+zip_file_cache = set()
+
+def writeStrToZip(zip_file,filename,data):
+    if filename in zip_file_cache:
+        return
+    zip_file.writestr(filename,data)
+    zip_file_cache.add(filename)
+
+def writeToZip(zip_file,local_filename,zip_filename):
+    if zip_filename in zip_file_cache:
+        return
+    zip_file.write(local_filename,zip_filename)
+    zip_file_cache.add(zip_filename)
 
 def HandleDDS(file_name,extension,file_record,output_zip):
 
@@ -220,7 +231,7 @@ def HandleDDS(file_name,extension,file_record,output_zip):
         im.save(png_data,format = 'PNG')
         png_data = png_data.getvalue()
         new_name = os.path.join(zip_path,file_name + '.png')
-        output_zip.writestr(new_name,png_data)
+        writeStrToZip(output_zip,new_name,png_data)
         print file_record.name,len(png_data)
         try:
             essential_dds.remove(file_record.name)
@@ -246,7 +257,7 @@ def HandleMusic(file_name,extension,file_record,output_zip):
             song = song.set_frame_rate(22050)
             song.export(outputf.name,'s16le',codec = 'pcm_s16le')
             zip_path = os.path.join('music',file_name + '.snd')
-            output_zip.write(outputf.name,zip_path)
+            writeToZip(output_zip,outputf.name,zip_path)
             music_files.append(zip_path)
         finally:
             os.unlink(outputf.name)
@@ -298,7 +309,7 @@ def HandleWav(file_name,extension,file_record,output_zip):
                     essential_sounds.remove(target)
                 except KeyError:
                     pass
-                output_zip.write(outputf.name,os.path.join('sounds',target))
+                writeToZip(output_zip,outputf.name,os.path.join('sounds',target))
         finally:
             os.unlink(outputf.name)
     finally:
@@ -309,7 +320,7 @@ def HandleFnt(file_name,extension,file_record,output_zip):
     global found_font
     if 'monofonto_verylarge02_dialogs2' not in file_name:
         return
-    output_zip.writestr('monofonto_verylarge02_dialogs2.fnt',file_record.read())
+    writeStrToZip(output_zip,'monofonto_verylarge02_dialogs2.fnt',file_record.read())
     found_font = True
 
 def AddCustomItems(zip_file):
@@ -323,6 +334,7 @@ def AddCustomItems(zip_file):
                      'chevrons1.png',
                      'scanline.png',
                      'full.png',
+                     'empty.png',
                      'fade.png'):
         zip_file.write(filename,filename)
     
@@ -378,9 +390,8 @@ if __name__ == '__main__':
                 #print bsa.version
                 for file_record in bsa.file_records.values():
                     file_name,extension = os.path.splitext(file_record.name)
-                    #print file_name,extension
-                    #if 'monofonto' not in file_name:
-                    #    continue
+                    #print file_name,extension,file_record.folder_name
+                    #continue
                     try:
                         handlers[extension](file_name,extension,file_record,output_zip)
                     except KeyError:
@@ -394,10 +405,10 @@ if __name__ == '__main__':
             if 'lincolnrifle' in item:
                 if any('items_308_ammo' in t for t in output_zip.namelist()):
                     continue
-            output_zip.write('full.png',os.path.splitext(item)[0] + '.png')
+            writeToZip(output_zip,'empty.png',os.path.splitext(item)[0] + '.png')
 
         for item in essential_sounds:
-            output_zip.writestr(os.path.join('sounds',item),'\x00\x00')
+            writeStrToZip(output_zip,os.path.join('sounds',item),'\x00\x00')
 
     if not found_font:
         print 'Failed to find font, is your fallout installation complete?'
