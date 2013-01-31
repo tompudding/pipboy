@@ -203,7 +203,7 @@ def HandleDDS(file_name,extension,file_record,output_zip):
             zip_path = ''
     if match:
         data = file_record.read()
-        print 'x',len(data)
+        #print 'x',len(data)
         data_file = StringIO.StringIO(data)
         im = Image.open(data_file)
         if 'screenglare' in file_record.name:
@@ -379,8 +379,8 @@ if __name__ == '__main__':
                 for file_record in bsa.file_records.values():
                     file_name,extension = os.path.splitext(file_record.name)
                     #print file_name,extension
-                    if 'monofonto' not in file_name:
-                        continue
+                    #if 'monofonto' not in file_name:
+                    #    continue
                     try:
                         handlers[extension](file_name,extension,file_record,output_zip)
                     except KeyError:

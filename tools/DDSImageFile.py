@@ -65,7 +65,7 @@ DDSCAPS_EXPECTED = DDSCAPS_TEXTURE
 # Python-only DXT1 decoder; this is slow!
 # Better to use _dxt1.decodeDXT1 if you can
 # (it's used automatically if available by DdsImageFile)
-def pythonDecodeDXT1(data):
+def pythonDecodeDXT1(data,args):
     # input: one "row" of data (i.e. will produce 4*width pixels)
     blocks = len(data) / 8  # number of blocks in row
     out = ['', '', '', '']  # row accumulators
@@ -110,7 +110,7 @@ def pythonDecodeDXT1(data):
     # All done.
     return tuple(out)
 
-def pythonDecodeDXT3(data):
+def pythonDecodeDXT3(data,args):
     # input: one "row" of data (i.e. will produce 4*width pixels)
     blocks = len(data) / 16  # number of blocks in row
     out = ['', '', '', '']  # row accumulators
@@ -162,7 +162,7 @@ def pythonDecodeDXT3(data):
     # All done.
     return tuple(out)
 
-def pythonDecodeDXT5(data):
+def pythonDecodeDXT5(data,args):
     # input: one "row" of data (i.e. will produce 4*width pixels)
     blocks = len(data) / 16  # number of blocks in row
     out = ['', '', '', '']  # row accumulators
@@ -226,6 +226,34 @@ def pythonDecodeDXT5(data):
     # All done.
     return tuple(out)
 
+def pythonDecodeUncompressed(data,args):
+    # input: one "row" of data (i.e. will produce 4*width pixels)
+    blocks = len(data) / 2  # number of blocks in row
+    out = []  # row accumulators
+    a = [0 for i in xrange(8)]
+    masks = args
+    shifts = []
+    #There's a cool bit twiddling algorithm for finding trailing zeros, but I can't be bothered 
+    #to debug it. 
+    for mask in masks:
+        x = mask
+        shift = 0
+        while (x&1) == 0:
+            x >>= 1
+            shift += 1
+        shifts.append(shift)
+
+    for xb in xrange(blocks):
+        block = struct.unpack('<H',data[xb*2:(xb+1)*2])[0]
+
+        r,g,b,a = (((block&mask)>>shift)<<4 for (mask,shift) in zip(masks,shifts))
+        if a == 240:
+            a = 255
+        out.append(''.join(chr(c) for c in (r,g,b,a)))
+
+    # All done.
+    return (''.join(out),)
+
 
 class DdsImageFile(ImageFile.ImageFile):
     format = 'DDS'
@@ -252,12 +280,15 @@ class DdsImageFile(ImageFile.ImageFile):
         if pf_dwSize != 32:
             raise SyntaxError, 'Expected pf_dwSize == 32, got %d' % pf_dwSize
 
+        #print '%04x %04x %04x %04x' % (pf_dwRBitMask,pf_dwGBitMask,pf_dwBBitMask,pf_dwRGBAlphaBitMask)
+
         caps_dwCaps1, caps_dwCaps2 = struct.unpack('<II 8x', ddsCaps)
         if (caps_dwCaps1 & DDSCAPS_EXPECTED) != DDSCAPS_EXPECTED:
             raise SyntaxError, 'Unsupported image caps: %08x' % caps_dwCaps1
 
         # check for DXT1
         if (pf_dwFlags & DDPF_FOURCC != 0):
+            self.args = None
             if pf_dwFourCC == 'DXT1':
                 if (pf_dwFlags & DDPF_ALPHAPIXELS != 0):
                     raise SyntaxError, 'DXT1 with Alpha not supported' # yet
@@ -266,11 +297,13 @@ class DdsImageFile(ImageFile.ImageFile):
                     self.dxt_decoder = pythonDecodeDXT1
                     self.blocksize = 8
                     self.modesize = 3
+                    self.pixelsperblock = 4
                     self.load = self._loadDXTOpaque
             elif pf_dwFourCC == 'DXT3':
                 self.mode = 'RGBA'
                 self.dxt_decoder = pythonDecodeDXT3
                 self.blocksize = 16
+                self.pixelsperblock = 4
                 self.modesize = 4
                 self.load = self._loadDXTOpaque
             elif pf_dwFourCC == 'DXT5':
@@ -278,16 +311,28 @@ class DdsImageFile(ImageFile.ImageFile):
                 self.dxt_decoder = pythonDecodeDXT5
                 self.blocksize = 16
                 self.modesize = 4
+                self.pixelsperblock = 4
                 self.load = self._loadDXTOpaque
             else:
                 print 'Unsupported FOURCC mode: %s' % pf_dwFourCC
                 raise SyntaxError, 'Unsupported FOURCC mode: %s' % pf_dwFourCC
         else:
             # XXX is this right? I don't have an uncompressed dds to play with
-            self.mode = 'RGB'
+            #dwPitchLinear = ((dwWidth + 1) >> 1)*4
+            dwPitchLinear = (dwWidth * 8 + 7)/8
+            #print dwWidth,dwHeight,dwPitchLinear
+            self.mode        = 'RGBA'
+            self.modesize = 4
+            self.dxt_decoder = pythonDecodeUncompressed
+            self.blocksize   = pf_dwRGBBitCount/8
+            self.pixelsperblock = 1
+            if self.blocksize != 2:
+                print 'unsupported rgb bits thing',
+            self.args        = (pf_dwRBitMask,pf_dwGBitMask,pf_dwBBitMask,pf_dwRGBAlphaBitMask)
+            self.load = self._loadDXTOpaque
             # Construct the tile.
-            self.tile = [('raw', (0,0,dwWidth,dwHeight), 128,
-                          ('RGBX', dwPitchLinear - dwWidth, 1))]
+            #self.tile = [('raw', (0,0,dwWidth,dwHeight), 128,
+            #              ('RGBX', 1024, 1))]
 
     def _loadDXTOpaque(self):
         #global dxt1Decoder
@@ -310,19 +355,22 @@ class DdsImageFile(ImageFile.ImageFile):
         data = []
         self.fp.seek(128) # skip header
 
-        linesize = (self.size[0] + 3) / 4 * self.blocksize # Number of data byte per row
-
+        linesize = ((self.size[0] + (self.pixelsperblock-1)) / self.pixelsperblock) * self.blocksize # Number of data byte per row
+        #print 'linesize = ',linesize
         baseoffset = 0
-        for yb in xrange((self.size[1] + 3) / 4):             
+        for yb in xrange((self.size[1] + (self.pixelsperblock-1)) / self.pixelsperblock):             
             linedata = self.fp.read(linesize)
-            decoded = self.dxt_decoder(linedata) # returns 4-tuple of RGB lines
+            decoded = self.dxt_decoder(linedata,self.args) # returns 4-tuple of RGB lines
+            #print 'yb',yb,len(decoded),(self.size[1] + (self.pixelsperblock-1)) / self.pixelsperblock
             for d in decoded:
                 # Make sure that if we have a texture size that's not a
                 # multiple of 4 that we correctly truncate the returned data
                 data.append(d[:self.size[0]*self.modesize])
 
         # Now build the final image from our data strings
-        data = string.join(data[:self.size[1]],'')
+        #print 'len',len(data),len(data[0])
+        data = ''.join(data[:self.size[1]])
+        #print 'len',len(data)
         self.im = Image.core.new(self.mode, self.size)
         self.fromstring(data)
         self._loaded = 1

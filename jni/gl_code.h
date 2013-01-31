@@ -118,7 +118,7 @@ struct Message {
 extern "C" {void PlayClip_c(short *buffer,size_t size,int queue,int q);}
 extern "C" {uint32_t CurrentlyPlaying();}
 extern "C" {void StopClip();}
-GLuint GenTexture(uint32_t w,uint32_t h,uint8_t *data);
+GLuint GenTexture(uint32_t w,uint32_t h,uint8_t *data, GLenum format = GL_RGBA);
 
 class Listener {
 public:
@@ -196,6 +196,7 @@ public:
     uint32_t file_height;
     size_t size;
     bool loaded;
+    GLenum format;
     char *fname;
 };
 

@@ -55,17 +55,17 @@ Font::Font(const char *tex_filename,const char *fnt_filename) {
         if(floats[1] == floats[3] && floats[2] == floats[4])
             continue;
 
-        tex_coords[0] = floats[5]/2.0;
-        tex_coords[1] = floats[6]/2.0;
-        tex_coords[2] = floats[1]/2.0;
-        tex_coords[3] = floats[2]/2.0;
-        tex_coords[4] = floats[3]/2.0;
-        tex_coords[5] = floats[4]/2.0;
-        tex_coords[6] = floats[7]/2.0;
-        tex_coords[7] = floats[8]/2.0;
+        tex_coords[0] = floats[5];
+        tex_coords[1] = floats[6];
+        tex_coords[2] = floats[1];
+        tex_coords[3] = floats[2];
+        tex_coords[4] = floats[3];
+        tex_coords[5] = floats[4];
+        tex_coords[6] = floats[7];
+        tex_coords[7] = floats[8];
 
-        GLfloat width  = (tex_coords[4]-tex_coords[2])*480/800;
-        GLfloat height = (tex_coords[1]-tex_coords[3]);
+        GLfloat width  = ((tex_coords[4]-tex_coords[2])*240/800);
+        GLfloat height = (tex_coords[1]-tex_coords[3])/2;
 
         LOGI("letter %c : %.2f %.2f",(char)i,width*100,height*100);
         LOGI("%d [%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f]",i,floats[0],floats[1],floats[2],floats[3],floats[4],floats[5],

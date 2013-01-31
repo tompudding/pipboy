@@ -204,6 +204,17 @@ void Image::Load() {
 
     // Row size in bytes.
     rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+    
+    if(rowbytes == (file_width*4)) {
+        format = GL_RGBA;
+    }
+    else if (rowbytes == (file_width*3)) {
+        format = GL_RGB;
+    }
+    else {
+        status = FILE_ERROR;
+        goto free_png_ptr;
+    }
 
     // Allocate the image_data as a big block, to be given to opengl
     if(rowbytes > 0x00010000) {
@@ -216,7 +227,7 @@ void Image::Load() {
         status = MEMORY_ERROR;
         goto free_data;
     }
-    LOGI("File %s allocated in %p\n",fname,data);
+    LOGI("File %s allocated in %p - %p\n",fname,data,&data[(rowbytes*theight)-1]);
     //row_pointers is for pointing to image_data for reading the png with libpng
     row_pointers = new png_bytep[theight];
     if (NULL == row_pointers) {
@@ -262,7 +273,7 @@ void Image::RefreshTexture() {
         return;
     }
     LOGE("Refreshing texture:%s %d:%d:%p:%d",fname,file_width,file_height,data,0);
-    texture = GenTexture(file_width,file_height,data);
+    texture = GenTexture(file_width,file_height,data,format);
     
 }
 

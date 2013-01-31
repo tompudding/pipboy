@@ -218,7 +218,7 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_step (JNIEnv *, j
     glare->Draw(0.1,0);
 }
 
-GLuint GenTexture(uint32_t w,uint32_t h,uint8_t *data) {
+GLuint GenTexture(uint32_t w,uint32_t h,uint8_t *data,GLenum format) {
     GLuint out;
     glGenTextures(1, &out);
     glBindTexture(GL_TEXTURE_2D, out);checkGlError(__LINE__);
@@ -239,7 +239,7 @@ GLuint GenTexture(uint32_t w,uint32_t h,uint8_t *data) {
               GL_TEXTURE_ENV_MODE,
               GL_REPLACE);checkGlError(__LINE__);
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);checkGlError(__LINE__);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, format, GL_UNSIGNED_BYTE, data);checkGlError(__LINE__);
     return out;
 }
 

@@ -5,8 +5,11 @@ done - move the sounds to the zip file
 done - loading screen / error messages
 done - make the errors helpful
 done - move configuration to a text file
-     - Remove survival skill if the image isn't there (i.e. built from fallout 3 and not NV)
-     - Make the dataview and songs configurable
+done - Remove survival skill if the image isn't there (i.e. built from fallout 3 and not NV)
+     - replace missing images with an empty image instead of a white one
+     - fix one of the music images being wrong
+done - Make the songs configurable
+     - make a general config for things like location and colour
      - fix the lifecycle stuff, which may be related to the next thing
      - fix the weird occasional black screen issue
      - replace the .snd files with compressed mp3s or such
