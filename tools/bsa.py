@@ -227,6 +227,8 @@ def HandleDDS(file_name,extension,file_record,output_zip):
             file_name = 'items__308_ammo'
         if 'face_00' in file_record.name:
             file_name = 'face'
+        if 'antivenom' in file_record.name:
+            zip_path = 'icons'
         png_data = StringIO.StringIO()
         im.save(png_data,format = 'PNG')
         png_data = png_data.getvalue()
@@ -390,8 +392,8 @@ if __name__ == '__main__':
                 #print bsa.version
                 for file_record in bsa.file_records.values():
                     file_name,extension = os.path.splitext(file_record.name)
-                    #print file_name,extension,file_record.folder_name
-                    #continue
+                    print file_name,extension,file_record.folder_name
+                    continue
                     try:
                         handlers[extension](file_name,extension,file_record,output_zip)
                     except KeyError:
