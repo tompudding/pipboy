@@ -161,7 +161,7 @@ essential_dds = set(('special_luck.dds'                           ,
                      'weap_skill_icon_sm_arms.dds'                ,
                      'reputations_novac.dds'                      ,
                      'item_antivenom.dds'                         ,
-                     'lincolnrifleammo.dds'                       ,
+                     'items__308_ammo.dds'                        ,
                      'face_00.dds'                                ,
                      'weap_skill_icon_melee.dds'                  ))
 
@@ -201,49 +201,45 @@ def writeToZip(zip_file,local_filename,zip_filename):
 def HandleDDS(file_name,extension,file_record,output_zip):
 
     zip_path = ''
-    if file_record.name in essential_dds:
-        zip_path = ''
-        match = True
-    else:
-        match = re.match('(perk|special|reputations|skills|weap_skill|weapons|vault_suit|item|items|apperal|appearal|apparel|missile)_.*\.dds',file_record.name)
-        if not match:
-            return
+    match = re.match('(perk|special|reputations|skills|weap_skill|weapons|vault_suit|item|items|apperal|appearal|apparel|missile)_.*\.dds',file_record.name)
+    if match:
         if match.groups()[0] in items_prefix:
             zip_path = 'icons'
-        else:
-            zip_path = ''
-    if match:
-        data = file_record.read()
-        #print 'x',len(data)
-        data_file = StringIO.StringIO(data)
-        im = Image.open(data_file)
-        if 'screenglare' in file_record.name:
-            im = screenglare_filter(im)
-            file_name = 'screenglare_alpha'
-        if 'monofonto_verylarge' in file_record.name:
-            file_name = 'monofonto_verylarge02_dialogs2'
-        if 'lincolnrifle' in file_record.name:
-            zip_path = 'icons'
-            file_name = 'items__308_ammo'
-        if 'face_00' in file_record.name:
-            file_name = 'face'
-        if 'antivenom' in file_record.name:
-            zip_path = 'icons'
-        png_data = StringIO.StringIO()
-        im.save(png_data,format = 'PNG')
-        png_data = png_data.getvalue()
-        new_name = os.path.join(zip_path,file_name + '.png')
-        writeStrToZip(output_zip,new_name,png_data)
-        print file_record.name,len(png_data)
-        try:
-            essential_dds.remove(file_record.name)
-        except KeyError:
-            pass
+    else:
+        if file_record.name not in essential_dds:
+            return
+
+    data = file_record.read()
+    #print 'x',len(data)
+    data_file = StringIO.StringIO(data)
+    im = Image.open(data_file)
+    if 'screenglare' in file_record.name:
+        im = screenglare_filter(im)
+        file_name = 'screenglare_alpha'
+    if 'monofonto_verylarge' in file_record.name:
+        file_name = 'monofonto_verylarge02_dialogs2'
+    if 'items_.308_ammo' in file_record.name:
+        file_name = 'items__308_ammo'
+    if 'face_00' in file_record.name:
+        file_name = 'face'
+
+    png_data = StringIO.StringIO()
+    im.save(png_data,format = 'PNG')
+    png_data = png_data.getvalue()
+    new_name = os.path.join(zip_path,file_name + '.png')
+    writeStrToZip(output_zip,new_name,png_data)
+    print file_record.name,len(png_data)
+    try:
+        essential_dds.remove(file_record.name)
+    except KeyError:
+        pass
 
 music_files = []
     
 def HandleMusic(file_name,extension,file_record,output_zip):
     if not file_name.startswith('mus_'):
+        return
+    if file_name.startswith('mus_inc_') or file_name.startswith('mus_bttl'):
         return
     print 'music file!',file_name,extension
     inputf = tempfile.NamedTemporaryFile(mode='wb', delete=False)
@@ -392,8 +388,8 @@ if __name__ == '__main__':
                 #print bsa.version
                 for file_record in bsa.file_records.values():
                     file_name,extension = os.path.splitext(file_record.name)
-                    print file_name,extension,file_record.folder_name
-                    continue
+                    #print file_name,extension,file_record.folder_name
+                    #continue
                     try:
                         handlers[extension](file_name,extension,file_record,output_zip)
                     except KeyError:
