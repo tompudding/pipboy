@@ -1,0 +1,13 @@
+0.54 #red 
+0.43 #green (try 0.855 for Fallout 3 style)
+0.19 #blue  (try 0.58 for Fallout 3 style)
+19   #level
+419  #hp current
+460  #hp max
+35   #ap current
+70   #ap max
+29200 #xp current
+29450 #xp max
+61   #caps
+Tom Gooding #name
+The Wasteland #location
