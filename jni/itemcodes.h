@@ -6,7 +6,8 @@ enum ItemType {
     MISC,
     AMMO,
     PANEL,
-    RADIO
+    RADIO,
+    EXIT
 };
 
 enum ItemCode {

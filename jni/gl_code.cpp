@@ -175,7 +175,7 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init  (JNIEnv *en
     LOGI("init monkey: %p %p",glare,viewlist);
 }
 
-JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_step (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_step (JNIEnv *env, jclass) {
     if(!initialised) {
         return;
     }
@@ -243,61 +243,166 @@ GLuint GenTexture(uint32_t w,uint32_t h,uint8_t *data,GLenum format) {
     return out;
 }
 
-JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_TouchEvent  (JNIEnv *, jclass, jfloat _x, jfloat _y) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_TouchEvent  (JNIEnv *env, jclass bob, jfloat _x, jfloat _y,jobject callbackClass) {
     float x = _x;
     float y = _y;
     LOGI("Native Touch event! %.2f %.2f",x,y);
 
-    //right triangle
-    if(y < x && y > 1-x) {
-        //if(x > 0.8) {
-        //    viewlist->Next();
-        //}
-        //else {
+    try {
+        //right triangle
+        if(y < x && y > 1-x) {
+            //if(x > 0.8) {
+            //    viewlist->Next();
+            //}
+            //else {
             viewlist->RightInView();
             //}
-    }
+        }
 
-    //left triangle
-    if(y > x && y < 1-x) {
-        //if(x < 0.3) {
-        //    viewlist->Prev();
-        //}
-        //else {
+        //left triangle
+        if(y > x && y < 1-x) {
+            //if(x < 0.3) {
+            //    viewlist->Prev();
+            //}
+            //else {
             viewlist->LeftInView();
             //}
-    }
+        }
 
-    //bottom triangle
-    if(y < x && y < 1-x) {
-        viewlist->DownInView();
-    }
+        //bottom triangle
+        if(y < x && y < 1-x) {
+            viewlist->DownInView();
+        }
 
-    //top triangle
-    if(y > x && y > 1-x) {
-        viewlist->UpInView();
+        //top triangle
+        if(y > x && y > 1-x) {
+            viewlist->UpInView();
+        }
+    }
+    catch(ErrorMessage message) {
+        jmethodID error_method = NULL;
+        jclass cls = env->FindClass("com/tompudding/pipboy/ProgressCallback");
+        if(NULL == cls) {
+            LOGI("Error finding class");
+            return;
+        }
+        error_method = env->GetMethodID(cls, "fatalError", "(Ljava/lang/String;)V");
+        if(NULL == error_method) {
+            LOGI("Error finding error method");
+            return;
+        }
+        
+        jstring error = env->NewStringUTF(message.message.c_str());
+        LOGI("Error :",message.message.c_str());
+        done = true;
+        env->CallVoidMethod(callbackClass,error_method,error);
+        font = NULL;
     }
 
     
 }
 
-JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LeftSwipe (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LeftSwipe (JNIEnv *env, jclass,jobject callbackClass) {
     LOGI("native leftswipe");
-    viewlist->Prev();
+    try {
+        viewlist->Prev();
+    }
+    catch(ErrorMessage message) {
+        jmethodID error_method = NULL;
+        jclass cls = env->FindClass("com/tompudding/pipboy/ProgressCallback");
+        if(NULL == cls) {
+            LOGI("Error finding class");
+            return;
+        }
+        error_method = env->GetMethodID(cls, "fatalError", "(Ljava/lang/String;)V");
+        if(NULL == error_method) {
+            LOGI("Error finding error method");
+            return;
+        }
+        
+        jstring error = env->NewStringUTF(message.message.c_str());
+        LOGI("Error :",message.message.c_str());
+        done = true;
+        env->CallVoidMethod(callbackClass,error_method,error);
+        font = NULL;
+    }
 }
 
-JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_RightSwipe (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_RightSwipe (JNIEnv *env, jclass,jobject callbackClass) {
     LOGI("native rightswipe");
-    viewlist->Next();
+    try {
+        viewlist->Next();
+    }
+    catch(ErrorMessage message) {
+        jmethodID error_method = NULL;
+        jclass cls = env->FindClass("com/tompudding/pipboy/ProgressCallback");
+        if(NULL == cls) {
+            LOGI("Error finding class");
+            return;
+        }
+        error_method = env->GetMethodID(cls, "fatalError", "(Ljava/lang/String;)V");
+        if(NULL == error_method) {
+            LOGI("Error finding error method");
+            return;
+        }
+        
+        jstring error = env->NewStringUTF(message.message.c_str());
+        LOGI("Error :",message.message.c_str());
+        done = true;
+        env->CallVoidMethod(callbackClass,error_method,error);
+        font = NULL;
+    }
 }
 
-JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LongPress (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LongPress (JNIEnv *env, jclass,jobject callbackClass) {
     LOGI("native longpress");
-    viewlist->Select();
+    try {
+        viewlist->Select();
+    }
+    catch(ErrorMessage message) {
+        jmethodID error_method = NULL;
+        jclass cls = env->FindClass("com/tompudding/pipboy/ProgressCallback");
+        if(NULL == cls) {
+            LOGI("Error finding class");
+            return;
+        }
+        error_method = env->GetMethodID(cls, "fatalError", "(Ljava/lang/String;)V");
+        if(NULL == error_method) {
+            LOGI("Error finding error method");
+            return;
+        }
+        
+        jstring error = env->NewStringUTF(message.message.c_str());
+        LOGI("Error :",message.message.c_str());
+        done = true;
+        env->CallVoidMethod(callbackClass,error_method,error);
+        font = NULL;
+    }
 }
 
 
-JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_MenuButton  (JNIEnv *, jclass) {
+JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_MenuButton  (JNIEnv *env, jclass,jobject callbackClass) {
     LOGI("m1");
-    viewlist->Select();
+    try {
+        viewlist->Select();
+    }
+    catch(ErrorMessage message) {
+        jmethodID error_method = NULL;
+        jclass cls = env->FindClass("com/tompudding/pipboy/ProgressCallback");
+        if(NULL == cls) {
+            LOGI("Error finding class");
+            return;
+        }
+        error_method = env->GetMethodID(cls, "fatalError", "(Ljava/lang/String;)V");
+        if(NULL == error_method) {
+            LOGI("Error finding error method");
+            return;
+        }
+        
+        jstring error = env->NewStringUTF(message.message.c_str());
+        LOGI("Error : %s",message.message.c_str());
+        done = true;
+        env->CallVoidMethod(callbackClass,error_method,error);
+        font = NULL;
+    }
 }

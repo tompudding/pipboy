@@ -32,10 +32,10 @@ public class NativePipboy {
     public static native void refresh();
     public static native void step();
     public static native void createEngine();
-    public static native void MenuButton();
+    public static native void MenuButton(ProgressCallback pb);
     public static native void createBufferQueueAudioPlayer();
-    public static native void TouchEvent(float x, float y);
-    public static native void LongPress();
-    public static native void LeftSwipe();
-    public static native void RightSwipe();
+    public static native void TouchEvent(float x, float y,ProgressCallback pb);
+    public static native void LongPress(ProgressCallback pb);
+    public static native void LeftSwipe(ProgressCallback pb);
+    public static native void RightSwipe(ProgressCallback pb);
 }

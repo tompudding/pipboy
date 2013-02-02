@@ -60,7 +60,10 @@ DataView::DataView (const char *background_filename, Font *_font) {
 
         lists[0]->AddItem(new RadioItem(&itemdata,_font));
     }
-
+    ItemData exitdata = {(ItemType)0};
+    exitdata.name = "Shut Down";
+    exitdata.type = EXIT;
+    lists[1]->AddItem(new ExitItem(&exitdata,_font));
    
     current_list = 0;
 
@@ -83,7 +86,7 @@ DataView::DataView (const char *background_filename, Font *_font) {
         items.push_back( PlacementInfo(0.73,0.91,1.4,1.4,time_text) );
     }
     items.push_back( PlacementInfo(0.32,0.031,1.4,1.4,new Text("Radio",font)) );
-    items.push_back( PlacementInfo(0.561,0.031,1.4,1.4,new Text("Quests",font)) );
+    items.push_back( PlacementInfo(0.561,0.031,1.4,1.4,new Text("Exit",font)) );
     items.push_back( PlacementInfo(0.502,0.250,1,1,new Box(0.63,0.01,0.01)) ) ;
     items.push_back( PlacementInfo(0.88,0.250,1,1,new Box(0.01,0.5,0.01)) ) ;
     for(int i=0;i<37;i++)
@@ -170,6 +173,27 @@ void DataView::Down() {
     pthread_mutex_unlock(&items_mutex);
 }
 
+void DataView::Left() {
+    //FIXME: synchronisation
+    pthread_mutex_lock(&items_mutex);
+    PlayClip(*menu_tab);
+    current_list = (current_list + 1)%2;
+    pthread_mutex_unlock(&items_mutex);
+    //StopClip();
+    //throw ErrorMessage(USER_QUIT,"User requested exit");
+}
+
+
+void DataView::Right() {
+    //FIXME: synchronisation
+    pthread_mutex_lock(&items_mutex);
+    PlayClip(*menu_tab);
+    current_list = (current_list + 1)%2;
+    pthread_mutex_unlock(&items_mutex);
+    //StopClip();
+    //throw ErrorMessage(USER_QUIT,"User requested exit");
+}
+
 void DataView::Select() {
     //FIXME: synchronisation
     pthread_mutex_lock(&items_mutex);
@@ -179,10 +203,6 @@ void DataView::Select() {
 
 
 RadioItem::RadioItem(const ItemData *data,Font *font) : Item(data,font),box(0.5,0.08,0.007){
-    name = strdup(data->name);
-    code = data->code;
-    type = data->type;
-
     LOGI("Trying to open radio sound %s",data->filename);
     clip = new MusicFile(data->filename);
     text = new Text(name,font);

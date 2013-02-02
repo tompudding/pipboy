@@ -46,9 +46,11 @@ class MyGestureDetector extends SimpleOnGestureListener implements OnClickListen
     private static final int SWIPE_MIN_DISTANCE = 120;
     private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-    MyGestureDetector(float a,float b) {
+    Progress jim;
+    MyGestureDetector(float a,float b,Progress _jim) {
         x = a;
         y = b;
+        jim = _jim;
     }
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -59,9 +61,9 @@ class MyGestureDetector extends SimpleOnGestureListener implements OnClickListen
             // right to left swipe
             if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                 //Log.i("nativepipboy", "Left Swipe");
-                NativePipboy.LeftSwipe();
+                NativePipboy.LeftSwipe(jim);
             }  else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-                NativePipboy.RightSwipe();
+                NativePipboy.RightSwipe(jim);
                 //Log.i("nativepipboy", "Right Swipe");
             }
         } catch (Exception e) {
@@ -77,11 +79,11 @@ class MyGestureDetector extends SimpleOnGestureListener implements OnClickListen
     };
     public boolean onSingleTapUp(MotionEvent event) {
         Log.i("nativepipboy","onsingletapup");
-        NativePipboy.TouchEvent((x-event.getRawX())/x,event.getRawY()/y);
+        NativePipboy.TouchEvent((x-event.getRawX())/x,event.getRawY()/y,jim);
         return false;
     }
     public void onLongPress(MotionEvent event) {
-        NativePipboy.LongPress();
+        NativePipboy.LongPress(jim);
         Log.i("nativepipboy","onlongpress");
     }
     public void onClick(View v) {
@@ -137,9 +139,9 @@ public class PipboyActivity extends Activity implements OnClickListener{
      */
     private final static boolean DEBUG_CHECK_GL_ERROR = true;
     private GestureDetector gestureDetector;
-    private final MyGestureDetector mgd = new MyGestureDetector(0,0);
     private Handler mHandler = new Handler();
     Progress jim = new Progress(this);
+    private final MyGestureDetector mgd = new MyGestureDetector(0,0,jim);
     ProgressDialog progressBar;
     PipboyRenderer bob;
 
@@ -234,7 +236,7 @@ public class PipboyActivity extends Activity implements OnClickListener{
  
     @Override public boolean onPrepareOptionsMenu (Menu menu){
         Log.i("nativepipboy","Menu1");
-        NativePipboy.MenuButton();
+        NativePipboy.MenuButton(jim);
         return false;
     }
 

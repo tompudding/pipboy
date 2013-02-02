@@ -49,7 +49,7 @@ Item::Item(const ItemData *data,Font *font){
     code = data->code;
     type = data->type;
     
-    if(data->type != RADIO) {
+    if(data->type != RADIO && data->type != EXIT) {
         strncat(temp_path,data->filename,sizeof(temp_path) - strlen(temp_path));
         LOGI("Trying to open %s",temp_path);
         icon = new Image(temp_path,1.0*480/800,1.0,standard_tex_coords);
@@ -347,7 +347,7 @@ void ItemList::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
         }
         if(i == current_item) {
             selected_box.Draw(x+0.135,y+0.786-(effective_count*0.08),1,1);
-            if((*i)->type != RADIO) {
+            if((*i)->type != RADIO && (*i)->type != EXIT) {
                 selected_boxnub.Draw(x+0.14,y+0.808-(effective_count*0.08),1,1);
                 if((*i)->code == equipped->weapon || (*i)->code == equipped->apparel_legs) {
                     general_text->text = "Unequip A)";
@@ -379,7 +379,7 @@ void ItemList::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
             
         }
         if((*i)->code == equipped->weapon || (*i)->code == equipped->apparel_legs) {
-            if((*i)->type != RADIO) {
+            if((*i)->type != RADIO && (*i)->type != EXIT) {
                 equipped_box->Draw(x+0.14,y+0.808-(effective_count*0.08),0.04,0.04);
             }
         }
@@ -530,4 +530,9 @@ void RadioItem::Select(EquippedItems *equipped){
         PlayClip(*clip,0,1);
         last_played = clip;
     }
+}
+
+void ExitItem::Select(EquippedItems *equipped) {
+    StopClip();
+    throw ErrorMessage(USER_QUIT,"User requested exit");
 }

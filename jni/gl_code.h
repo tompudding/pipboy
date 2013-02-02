@@ -59,14 +59,14 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init (JNIEnv *, j
 JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_step
   (JNIEnv *, jclass);
 
-    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_TouchEvent (JNIEnv *, jclass, jfloat x, jfloat y);
+    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_TouchEvent (JNIEnv *, jclass, jfloat x, jfloat y,jobject callbackClass);
 
 JNIEXPORT jboolean JNICALL Java_com_tompudding_pipboy_NativePipboy_selectClip(JNIEnv* env, jclass clazz, jint which,jint count);
 
-    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_MenuButton (JNIEnv *, jclass);
-    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LeftSwipe (JNIEnv *, jclass);
-    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_RightSwipe (JNIEnv *, jclass);
-    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LongPress (JNIEnv *, jclass);
+    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_MenuButton (JNIEnv *, jclass,jobject callbackClass);
+    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LeftSwipe (JNIEnv *, jclass,jobject callbackClass);
+    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_RightSwipe (JNIEnv *, jclass,jobject callbackClass);
+    JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_LongPress (JNIEnv *, jclass,jobject callbackClass);
     
 
     int GetExit();
@@ -87,7 +87,8 @@ enum error {
     SOCKET_ERROR,
     THREAD_ERROR,
     UNINITIALISED,
-    MEMORY_ERROR
+    MEMORY_ERROR,
+    USER_QUIT
 };
 
 struct ErrorMessage {
@@ -482,6 +483,13 @@ public:
     SoundClip *clip;
 };
 
+class ExitItem : public Item {
+public:
+    ExitItem(const ItemData *data,Font *font) : Item(data,font) {};
+    void Draw(GLfloat x,GLfloat y,GLfloat xscale=1.0, GLfloat yscale=1.0) {};
+    void Select(EquippedItems *equipped);
+};
+
 struct EquippedItems {
 EquippedItems() : weapon(NO_ITEM),apparel_legs(NO_ITEM),apparel_hat(NO_ITEM),apparel_glasses(NO_ITEM) {};
     ItemCode weapon;
@@ -720,6 +728,8 @@ public:
     void Up();
     void Down();
     void Select();
+    void Right();
+    void Left();
 
     Font *font;
     Image *background;

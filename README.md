@@ -35,3 +35,7 @@ FAQ
  **I saw the sketch, where's the circuit diagram?**
 
  Working on it!
+
+ **Why is the pipboy, er, upside down?**
+
+ That was an accident I can't be bothered to fix. Turn your phone the other way up :)
