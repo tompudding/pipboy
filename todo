@@ -9,7 +9,7 @@ done - Remove survival skill if the image isn't there (i.e. built from fallout 3
 done - replace missing images with an empty image instead of a white one
 done - fix one of the music images being wrong
 done - Make the songs configurable
-     - make a general config for things like location and colour
+done - make a general config for things like location and colour
 done - put an exit into the app
      - package bsa.py for windows
      - fix the lifecycle stuff, which may be related to the next thing

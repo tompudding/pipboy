@@ -187,9 +187,17 @@ ItemsView::ItemsView (const char *background_filename, Font *_font, GeneralConfi
 
     items.push_back( PlacementInfo(0.178,0.9450,2.,2.,new Text("ITEMS",font)) );
     items.push_back( PlacementInfo(0.314,0.91,1.4,1.4,new Text("Wg 168/210",font)) );
-    items.push_back( PlacementInfo(0.469,0.91,1.4,1.4,new Text("HP 335/335",font)) );
+    if(sizeof(buffer) <= snprintf(buffer,sizeof(buffer),"HP %d/%d",config.hp.current,config.hp.max)) {
+        throw ErrorMessage(MEMORY_ERROR,"snprintf error in ItemsView::ItemsView");
+    }
+    buffer[sizeof(buffer)-1] = 0;
+    items.push_back( PlacementInfo(0.469,0.91,1.4,1.4,new Text(buffer,font)) );
     items.push_back( PlacementInfo(0.644,0.91,1.4,1.4,new Text("DT 36.0",font)) );
-    items.push_back( PlacementInfo(0.771,0.91,1.4,1.4,new Text("Caps 580",font)) );
+    if(sizeof(buffer) <= snprintf(buffer,sizeof(buffer),"Caps %d",config.caps)) {
+        throw ErrorMessage(MEMORY_ERROR,"snprintf error in ItemsView::ItemsView");
+    }
+    buffer[sizeof(buffer)-1] = 0;
+    items.push_back( PlacementInfo(0.771,0.91,1.4,1.4,new Text(buffer,font)) );
     items.push_back( PlacementInfo(0.152,0.031,1.4,1.4,new Text("Weapons",font)) );
     items.push_back( PlacementInfo(0.306,0.031,1.4,1.4,new Text("Apparel",font)) );
     items.push_back( PlacementInfo(0.48,0.031,1.4,1.4,new Text("Aid",font)) );

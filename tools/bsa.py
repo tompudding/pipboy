@@ -152,7 +152,6 @@ essential_dds = set(('special_luck.dds'                           ,
                      'left_arm.dds'                               ,
                      'forward.dds'                                ,
                      'backward.dds'                               ,
-                     #'left.dds'                                   ,
                      'right.dds'                                  ,
                      'weap_skill_icon_explosives.dds'             ,
                      'weap_skill_icon_energy.dds'                 ,
@@ -372,7 +371,7 @@ if __name__ == '__main__':
         print '%s is not a directory' % sys.argv[1]
         raise SystemExit
 
-    for filename in ('perks.txt','special.txt','skills.txt','items.txt'):
+    for filename in ('perks.txt','special.txt','skills.txt','items.txt','config.txt'):
         #set up the default lists
         with open(filename,'rb') as inf:
             with open(os.path.join(target_dir,filename),'wb') as outf:
