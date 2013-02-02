@@ -1,12 +1,12 @@
 #include "gl_code.h"
 #include <unistd.h>
 
-ViewList::ViewList() {
+ViewList::ViewList(GeneralConfig &config) {
     pthread_mutex_init(&viewlist_mutex,NULL);
     pthread_mutex_lock(&viewlist_mutex);
-    viewlist.push_back(new StatsView("stats_bg.png",font));
-    viewlist.push_back(new ItemsView("items_bg.png",font));
-    viewlist.push_back(new DataView("data_bg.png",font));
+    viewlist.push_back(new StatsView("stats_bg.png",font,config));
+    viewlist.push_back(new ItemsView("items_bg.png",font,config));
+    viewlist.push_back(new DataView("data_bg.png",font,config));
     current_view = viewlist.begin();
     pthread_mutex_unlock(&viewlist_mutex);
 }

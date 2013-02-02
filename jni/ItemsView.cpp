@@ -40,7 +40,7 @@ static ItemType type_from_string(char *input) {
     return (ItemType)-1;
 }
 
-ItemsView::ItemsView (const char *background_filename, Font *_font){
+ItemsView::ItemsView (const char *background_filename, Font *_font, GeneralConfig &config){
     FILE *f = NULL;
     char buffer[1024] = {0};
     int i;

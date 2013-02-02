@@ -35,6 +35,9 @@ ItemConditionBar *general_condition_bar = NULL;
 int initialised = 0;
 struct timeval tv = {0};
 bool done = false;
+GLfloat global_r = 0;
+GLfloat global_g = 0;
+GLfloat global_b = 0;
 
 GLfloat standard_tex_coords[] = {0, 1.0,
                                  0, 0.0,
@@ -103,6 +106,10 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load  (JNIEnv *en
                                         "ui_static_d_04.wav.snd",
                                         "ui_static_d_05.wav.snd",
                                         NULL};
+        GeneralConfig config = GeneralConfig("bob");
+        global_r = config.rgb[0];
+        global_g = config.rgb[1];
+        global_b = config.rgb[2];
         if(NULL == listener)
             listener  = new Listener();
         font      = new Font("monofonto_verylarge02_dialogs2.png","monofonto_verylarge02_dialogs2.fnt");
@@ -117,7 +124,7 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_load  (JNIEnv *en
             item_map[itemdata[i].code] = &(itemdata[i]);
         }
         
-        viewlist              = new ViewList();
+        viewlist              = new ViewList(config);
         mode_change           = new SoundClip( "mode_change.snd");
         menu_tab              = new SoundClip( "menu_tab.snd");
         mode_change_buzz      = new RandomSoundClip((char **)static_sounds);
@@ -165,7 +172,7 @@ JNIEXPORT void JNICALL Java_com_tompudding_pipboy_NativePipboy_init  (JNIEnv *en
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);checkGlError(__LINE__);
     glDisable(GL_DEPTH_TEST);checkGlError(__LINE__);
     //glColor4f(0.54f, 0.43f, 0.19f,1.0f);
-    glColor4f(0.54f,0.855f,0.58f,1.0f);
+    glColor4f(global_r,global_g,global_b,1.0f);
 
     white_texture = GenTexture(1,1,(uint8_t*)&white);
     grey_texture = GenTexture(1,1,(uint8_t*)&grey);

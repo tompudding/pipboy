@@ -1,7 +1,7 @@
 #include "gl_code.h"
 #include <unistd.h>
 
-DataView::DataView (const char *background_filename, Font *_font) {
+DataView::DataView (const char *background_filename, Font *_font, GeneralConfig &config) {
     struct tm stm;
     time_t t;
     char temp[128];
@@ -80,7 +80,7 @@ DataView::DataView (const char *background_filename, Font *_font) {
     strftime(temp,sizeof(temp),"%d.%m.%y, %H:%M",localtime(&t));
     background = new Image(background_filename,0.8,1,standard_tex_coords);
     items.push_back( PlacementInfo(0.187,0.9450,2.,2.,new Text("DATA",font)) );
-    items.push_back( PlacementInfo(0.46,0.91,1.4,1.4,new Text("Halloween Judder",font)) );
+    items.push_back( PlacementInfo(0.46,0.91,1.4,1.4,new Text(config.location.c_str(),font)) );
     time_text = new Text(strdup(temp),font);
     if(time_text) {
         items.push_back( PlacementInfo(0.73,0.91,1.4,1.4,time_text) );
@@ -124,8 +124,7 @@ void DataView::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {
         time_t t;
         t = time(NULL);
         strftime(temp,sizeof(temp),"%d.%m.%y, %H:%M",localtime(&t));
-        free((void *)time_text->text);
-        time_text->text = (const char *)strdup(temp);
+        time_text->SetText(temp);
     }
     if(CurrentlyPlaying()) {
         //draw awesome animation

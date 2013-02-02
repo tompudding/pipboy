@@ -32,7 +32,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := libnativepipboy
 LOCAL_CFLAGS    := -Werror
 LOCAL_CPPFLAGS += -fexceptions 
-LOCAL_SRC_FILES := gl_code.cpp Character.cpp StatsView.cpp Image.cpp Text.cpp Box.cpp ViewList.cpp native-audio-jni.c Sound.cpp Listener.cpp Items.cpp itemdata.cpp ScrollBar.cpp ItemsView.cpp DataView.cpp
+LOCAL_SRC_FILES := gl_code.cpp Character.cpp StatsView.cpp Image.cpp Text.cpp Box.cpp ViewList.cpp native-audio-jni.c Sound.cpp Listener.cpp Items.cpp itemdata.cpp ScrollBar.cpp ItemsView.cpp DataView.cpp GeneralConfig.cpp
 LOCAL_LDLIBS    := -L$(SYSROOT)/usr/lib -lz -llog -lGLESv1_CM -lstdc++ -lOpenSLES
 LOCAL_STATIC_LIBRARIES := libpng libzip
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../android-ndk-assets/project/jni/libpng  $(LOCAL_PATH)/../android-ndk-assets/project/jni/libzip

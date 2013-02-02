@@ -120,6 +120,7 @@ extern "C" {void PlayClip_c(short *buffer,size_t size,int queue,int q);}
 extern "C" {uint32_t CurrentlyPlaying();}
 extern "C" {void StopClip();}
 GLuint GenTexture(uint32_t w,uint32_t h,uint8_t *data, GLenum format = GL_RGBA);
+class GeneralConfig;
 
 class Listener {
 public:
@@ -326,16 +327,19 @@ public:
 
 class Text : public Drawable {
 public:
-    Text(const char *_text, Font *_font) : text(_text),font(_font) {};
+    Text(const char *_text, Font *_font);
+    ~Text();
     void Draw(GLfloat x,GLfloat y,GLfloat xscale=1.0, GLfloat yscale=1.0);
+    void SetText(const char *_text);
 
-    const char *text;
+    char *text;
     Font *font;
+    size_t current_len;
 };
 
 class Character : public Drawable {
 public:
-    Character();
+    Character(GeneralConfig &config);
 
     Image *heads;
     Image *faces;
@@ -526,7 +530,23 @@ public:
     EquippedItems *equipped;
 };
 
+struct statistic {
+    uint32_t current;
+    uint32_t max;
+};
 
+struct GeneralConfig {
+    GeneralConfig(const char *filename);
+
+    float rgb[3];
+    uint32_t level;
+    statistic hp;
+    statistic ap;
+    statistic xp;
+    string name;
+    string location;
+    uint32_t caps;    
+};
 
 class View {
 public:
@@ -551,7 +571,7 @@ public:
 
 class ConditionSubView : public View {
 public:
-    ConditionSubView() ;
+    ConditionSubView(GeneralConfig &config) ;
     
 };
 
@@ -583,7 +603,7 @@ public:
 
 class StatusSubView : public View {
 public:
-    StatusSubView();
+    StatusSubView(GeneralConfig &config);
 
     void Draw(GLfloat x,GLfloat y,GLfloat xscale=1.0, GLfloat yscale=1.0);
     void Up() ;
@@ -673,7 +693,7 @@ public:
 
 class StatsView : public View {
 public:
-    StatsView (const char *background_filename, Font *font);
+    StatsView (const char *background_filename, Font *font, GeneralConfig &config);
     void    Draw(GLfloat x,GLfloat y,GLfloat xscale=1.0, GLfloat yscale=1.0);
 
     void Up()    ;
@@ -698,7 +718,7 @@ public:
 
 class ItemsView : public View {
 public:
-    ItemsView (const char *background_filename, Font *font);
+    ItemsView (const char *background_filename, Font *font, GeneralConfig &config);
     void    Draw(GLfloat x,GLfloat y,GLfloat xscale=1.0, GLfloat yscale=1.0);
     void Up();
     void Down();
@@ -723,7 +743,7 @@ public:
 
 class DataView : public View {
 public:
-    DataView (const char *background_filename, Font *font);
+    DataView (const char *background_filename, Font *font, GeneralConfig &config);
     void    Draw(GLfloat x,GLfloat y,GLfloat xscale=1.0, GLfloat yscale=1.0);
     void Up();
     void Down();
@@ -751,7 +771,7 @@ typedef list<View*> viewlist_t;
 
 class ViewList {
 public:
-    ViewList();
+    ViewList(GeneralConfig &config);
     ~ViewList();
 
     View *CurrentView();

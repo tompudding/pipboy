@@ -10,6 +10,31 @@ void Text::Draw (GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
 #define FONT_CHUNK_NUM 256
 #define FONT_CHUNK_SIZE 14
 
+Text::Text(const char *_text, Font *_font) {
+    text = strdup(_text);
+    current_len = strlen(_text);
+    font = _font;
+}
+
+Text::~Text() {
+    if(NULL != text) {
+        free(text);
+    }
+}
+
+void Text::SetText(const char *_text) {
+    if(strlen(_text) <= current_len) {
+        strncpy(text,_text,current_len+1);
+    }
+    else {
+        if(NULL != text) {
+            free(text);
+        }
+        text = strdup(_text);
+        current_len = strlen(_text);
+    }
+}
+
 Font::Font(const char *tex_filename,const char *fnt_filename) {
     FILE     *fnt_f;
     zip_file *file        = NULL;

@@ -1,15 +1,37 @@
 #include "gl_code.h"
 #include <unistd.h>
 
-StatsView::StatsView (const char *background_filename, Font *_font) {
+StatsView::StatsView (const char *background_filename, Font *_font, GeneralConfig &config) {
+    char temp_path[1024]      = {0};
+    //Hideous memory leaks all over this function
     pthread_mutex_init(&items_mutex,NULL);
     background = new Image(background_filename,0.8,1,standard_tex_coords);
     font = _font;
     items.push_back( PlacementInfo(0.178,0.9450,2.,2.,new Text("STATS",font)) );
-    items.push_back( PlacementInfo(0.31,0.91,1.4,1.4,new Text("LVL 19",font)) );
-    items.push_back( PlacementInfo(0.405,0.91,1.4,1.4,new Text("HP 460/460",font)) );
-    items.push_back( PlacementInfo(0.566,0.91,1.4,1.4,new Text("AP 75/75",font)) );
-    items.push_back( PlacementInfo(0.696,0.91,1.4,1.4,new Text("XP 29297/29450",font)) );
+
+    if(sizeof(temp_path) <= snprintf(temp_path,sizeof(temp_path),"LVL %d",config.level)) {
+        throw ErrorMessage(MEMORY_ERROR,"snprintf error in StatsView::StatsView");
+    }
+    temp_path[sizeof(temp_path)-1] = 0;
+    items.push_back( PlacementInfo(0.31,0.91,1.4,1.4,new Text((const char *)temp_path,font)) );
+
+    if(sizeof(temp_path) <= snprintf(temp_path,sizeof(temp_path),"HP %d/%d",config.hp.current,config.hp.max)) {
+        throw ErrorMessage(MEMORY_ERROR,"snprintf error in StatsView::StatsView");
+    }
+    temp_path[sizeof(temp_path)-1] = 0;
+    items.push_back( PlacementInfo(0.405,0.91,1.4,1.4,new Text((const char *)temp_path,font)) );
+
+    if(sizeof(temp_path) <= snprintf(temp_path,sizeof(temp_path),"AP %d/%d",config.ap.current,config.ap.max)) {
+        throw ErrorMessage(MEMORY_ERROR,"snprintf error in StatsView::StatsView");
+    }
+    temp_path[sizeof(temp_path)-1] = 0;
+    items.push_back( PlacementInfo(0.566,0.91,1.4,1.4,new Text((const char *)temp_path,font)) );
+
+    if(sizeof(temp_path) <= snprintf(temp_path,sizeof(temp_path),"XP %d/%d",config.xp.current,config.xp.max)) {
+        throw ErrorMessage(MEMORY_ERROR,"snprintf error in StatsView::StatsView");
+    }
+    temp_path[sizeof(temp_path)-1] = 0;
+    items.push_back( PlacementInfo(0.696,0.91,1.4,1.4,new Text((const char *)temp_path,font)) );
     items.push_back( PlacementInfo(0.142,0.031,1.4,1.4,new Text("Status",font)) );
     items.push_back( PlacementInfo(0.3030,0.031,1.4,1.4,new Text("S.P.E.C.I.A.L",font)) );
     items.push_back( PlacementInfo(0.49,0.031,1.4,1.4,new Text("Skills",font)) );
@@ -22,7 +44,7 @@ StatsView::StatsView (const char *background_filename, Font *_font) {
     boxes[3] = new PlacementInfo(0.618,0.005,1,1, new Box(0.154,0.08,0.007));
     boxes[4] = new PlacementInfo(0.749,0.005,1,1, new Box(0.175,0.08,0.007));
 
-    subviews[0] = new StatusSubView();
+    subviews[0] = new StatusSubView(config);
     subviews[1] = new SpecialSubView();
     subviews[2] = new SkillsSubView();
     subviews[3] = new PerksSubView();
@@ -110,7 +132,7 @@ void StatusSubView::VerticalPos(float pos,int sound) {
     }
 }
 
-StatusSubView::StatusSubView() {
+StatusSubView::StatusSubView(GeneralConfig &config) {
     pthread_mutex_init(&items_mutex,NULL);
    
     //items.push_back( PlacementInfo(0.1335,0.779,1,1, new Box(0.13,0.08,0.007)));
@@ -128,7 +150,7 @@ StatusSubView::StatusSubView() {
         boxes[i] = new PlacementInfo(0.1335,0.779-i*spacing,1,1, new Box(0.13,0.08,0.007));
     }
 
-    subviews[0] = new ConditionSubView();
+    subviews[0] = new ConditionSubView(config);
     subviews[1] = new RadiationSubView();
     subviews[2] = new EffectsSubView();
     subviews[3] = new WaterSubView();
@@ -137,9 +159,9 @@ StatusSubView::StatusSubView() {
 
 }
 
-ConditionSubView::ConditionSubView() {
+ConditionSubView::ConditionSubView(GeneralConfig &config) {
     pthread_mutex_init(&items_mutex,NULL);
-    items.push_back( PlacementInfo(0.0,0.027,1.2,1.2,new Character()) );
+    items.push_back( PlacementInfo(0.0,0.027,1.2,1.2,new Character(config)) );
     items.push_back( PlacementInfo(0.463,0.844,1,1, new ConditionBar(0.5,cb_plain)) );
     items.push_back( PlacementInfo(0.463,0.544,1,1, new ConditionBar(0.5,cb_plain)) );
     items.push_back( PlacementInfo(0.640,0.694,1,1, new ConditionBar(0.5,cb_pointleft)) );
@@ -898,14 +920,14 @@ void SpecialSubView::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {
         char temp[3] = {0};
         temp[0] = stats[i] >= 10 ? '1' : ' ';
         temp[1] = '0' + ((stats[i]%10));
-        general_text->text = (const char*)&temp;
+        general_text->SetText((const char*)&temp);
         general_text->Draw(x+0.33,y+0.8-0.08*i,1.4,1.4);
     }
     selected_box.Draw(x+0.135,y+0.778-(current_item*0.08),1,1);
     icons[current_item]->Draw(x+0.492,y+0.33,0.65,0.65);
     box.Draw(x+0.415,y+0.3);
     for(int i=0;i<5;i++) {
-        general_text->text = descriptions[current_item][i];
+        general_text->SetText((const char*)descriptions[current_item][i]);
         general_text->Draw(x+0.415,y+0.30-0.05*i,1.3,1.3);
     }
     pthread_mutex_unlock(&items_mutex);
@@ -921,7 +943,7 @@ void SkillsSubView::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {
             continue;
         i->item->Draw(i->x,i->y+(display_start*0.08),i->xscale,i->yscale);
         snprintf(temp,sizeof(temp),"%3d",stats[count]);
-        general_text->text = (const char*)&temp;
+        general_text->SetText((const char*)&temp);
         general_text->Draw(x+0.36,y+0.8-0.08*effective_count,1.4,1.4);
 
         if(count >= display_start + display_num)
@@ -932,7 +954,7 @@ void SkillsSubView::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {
     icons[current_item]->Draw(x+0.492,y+0.33,0.65,0.65);
     box.Draw(x+0.415,y+0.3);
     for(int i=0;i<5;i++) {
-        general_text->text = descriptions[current_item][i];
+        general_text->SetText((const char*)descriptions[current_item][i]);
         general_text->Draw(x+0.415,y+0.30-0.05*i,1.3,1.3);
     }
     if(items.size() > display_num) {
@@ -961,7 +983,7 @@ void PerksSubView::Draw(GLfloat x, GLfloat y,GLfloat xscale, GLfloat yscale) {
     icons[current_item]->Draw(x+0.492,y+0.33,0.65,0.65);
     box.Draw(x+0.415,y+0.3);
     for(int i=0;i<5;i++) {
-        general_text->text = descriptions[current_item][i];
+        general_text->SetText((const char*)descriptions[current_item][i]);
         general_text->Draw(x+0.415,y+0.30-0.05*i,1.3,1.3);
     }
     if(items.size() > display_num) {

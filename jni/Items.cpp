@@ -79,31 +79,31 @@ void WeaponItem::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
     box.Draw(x+0.465+w*480/800,y+0.26);
 
     snprintf(temp,sizeof(temp),"DAM %4.1f",damage);
-    general_text->text = (const char*)&temp;
+    general_text->SetText((const char*)&temp);
     general_text->Draw(x+0.45+0.005,y+0.35+0.02,1.5,1.5);
 
     snprintf(temp,sizeof(temp),"WG  %4.1f",weight);
-    general_text->text = (const char*)&temp;
+    general_text->SetText( (const char*)&temp);
     general_text->Draw(x+0.465+w*480/800+0.005,y+0.35+0.02,1.6,1.6);
 
     snprintf(temp,sizeof(temp),"VAL %4d",value);
-    general_text->text = (const char*)&temp;
+    general_text->SetText( (const char*)&temp);
     general_text->Draw(x+0.48+2*w*480/800+0.005,y+0.35+0.02,1.6,1.6);
 
     snprintf(temp,sizeof(temp),"STR %3d",requirements.strength);
-    general_text->text = (const char*)&temp;
+    general_text->SetText( (const char*)&temp);
     general_text->Draw(x+0.48+2*w*480/800+0.005,y+0.44+0.02,1.6,1.6);
 
     if(calibre != 0)
     {
         snprintf(temp,sizeof(temp),".%3d (6/120)",calibre);
-        general_text->text = (const char*)&temp;
+        general_text->SetText( (const char*)&temp);
     }
     else
-        general_text->text = "--";
+        general_text->SetText( "--");
     general_text->Draw(x+0.465+w*480/800+0.005,y+0.26+0.02,1.6,1.6);
 
-    general_text->text = "CND";
+    general_text->SetText( "CND");
     general_text->Draw(x+0.45+0.005,y+0.26+0.02,1.5,1.5);
 
     general_condition_bar->SetSize(condition);
@@ -144,7 +144,7 @@ void WeaponItem::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
     if(todraw){
         todraw->Draw(x+0.45,y+0.44+0.02,0.1*480/800,0.1);
         snprintf(temp,sizeof(temp),"%2d",todrawv);
-        general_text->text = (const char*)&temp;
+        general_text->SetText( (const char*)&temp);
         general_text->Draw(x+0.50,y+0.44+0.02,1.6,1.6);
     }
     //
@@ -168,27 +168,27 @@ void ApparelItem::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
 
     if(damage_reduction >= 0) {
         snprintf(temp,sizeof(temp),"DR %4d",damage_reduction);
-        general_text->text = (const char*)&temp;
+        general_text->SetText( (const char*)&temp);
     }
     else
-        general_text->text = "--";
+        general_text->SetText( "--");
     general_text->Draw(x+0.45+0.005,y+0.35+0.02,1.5,1.5);
 
     snprintf(temp,sizeof(temp),"WG  %4.1f",weight);
-    general_text->text = (const char*)&temp;
+    general_text->SetText( (const char*)&temp);
     general_text->Draw(x+0.465+w*480/800+0.005,y+0.35+0.02,1.6,1.6);
 
     snprintf(temp,sizeof(temp),"VAL %4d",value);
-    general_text->text = (const char*)&temp;
+    general_text->SetText( (const char*)&temp);
     general_text->Draw(x+0.48+2*w*480/800+0.005,y+0.35+0.02,1.6,1.6);
  
-    general_text->text = armour_class;   
+    general_text->SetText( armour_class);   
     general_text->Draw(x+0.465+w*480/800+0.005,y+0.26+0.02,1.6,1.6);
 
-    general_text->text = special;   
+    general_text->SetText( special);   
     general_text->Draw(x+0.45,y+0.17+0.02,1.6,1.6);
 
-    general_text->text = "CND";
+    general_text->SetText( "CND");
     general_text->Draw(x+0.45+0.005,y+0.26+0.02,1.5,1.5);
 
     general_condition_bar->SetSize(condition);
@@ -213,19 +213,19 @@ void AidItem::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
 
     if(weight > 0) {
         snprintf(temp,sizeof(temp),"WG  %4.1f",weight);
-        general_text->text = (const char*)&temp;
+        general_text->SetText( (const char*)&temp);
     }
     else
-        general_text->text = "--";
+        general_text->SetText( "--");
     general_text->Draw(x+0.465+w*480/800+0.005,y+0.35+0.02,1.6,1.6);
 
     snprintf(temp,sizeof(temp),"VAL %4d",value);
-    general_text->text = (const char*)&temp;
+    general_text->SetText( (const char*)&temp);
     general_text->Draw(x+0.48+2*w*480/800+0.005,y+0.35+0.02,1.6,1.6);
  
 
     snprintf(temp,sizeof(temp),"EFFECTS %25s",special);
-    general_text->text = (const char*)&temp;
+    general_text->SetText( (const char*)&temp);
     general_text->Draw(x+0.45,y+0.26+0.02,1.4,1.4);
 
     //
@@ -245,14 +245,14 @@ void MiscItem::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
 
     if(weight > 0) {
         snprintf(temp,sizeof(temp),"WG  %4.1f",weight);
-        general_text->text = (const char*)&temp;
+        general_text->SetText( (const char*)&temp);
     }
     else
-        general_text->text = "--";
+        general_text->SetText( "--");
     general_text->Draw(x+0.465+w*480/800+0.005,y+0.35+0.02,1.6,1.6);
 
     snprintf(temp,sizeof(temp),"VAL %4d",value);
-    general_text->text = (const char*)&temp;
+    general_text->SetText( (const char*)&temp);
     general_text->Draw(x+0.48+2*w*480/800+0.005,y+0.35+0.02,1.6,1.6);
  
 }
@@ -268,13 +268,13 @@ void PanelItem::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
     box.SetSize(w*3+(0.03*800/480),0.08,0.007);
     box.Draw(x+0.45,y+0.35);
 
-    general_text->text = name;
+    general_text->SetText( name);
     general_text->Draw(x+0.45,y+0.35+0.02,1.6,1.6);
 
-    general_text->text = (const char*)armour_class;
+    general_text->SetText( (const char*)armour_class);
     general_text->Draw(x+0.45,y+0.26+0.02,1.6,1.6);
 
-    general_text->text = (const char*)special;
+    general_text->SetText( (const char*)special);
     general_text->Draw(x+0.48+2*w*480/800+0.005,y+0.26+0.02,1.6,1.6);
  
 }
@@ -290,13 +290,13 @@ void RadioItem::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
     box.SetSize(w*3+(0.03*800/480),0.08,0.007);
     box.Draw(x+0.45,y+0.35);
 
-    general_text->text = name;
+    general_text->SetText( name );
     general_text->Draw(x+0.45,y+0.35+0.02,1.6,1.6);
 
-    general_text->text = (const char*)armour_class;
+    general_text->SetText( (const char*)armour_class );
     general_text->Draw(x+0.45,y+0.26+0.02,1.6,1.6);
 
-    general_text->text = (const char*)special;
+    general_text->SetText( (const char*)special );
     general_text->Draw(x+0.48+2*w*480/800+0.005,y+0.26+0.02,1.6,1.6);*/
  
 }
@@ -315,14 +315,14 @@ void AmmoItem::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
 
     if(weight > 0) {
         snprintf(temp,sizeof(temp),"WG  %4.1f",weight);
-        general_text->text = (const char*)&temp;
+        general_text->SetText( (const char*)&temp );
     }
     else
-        general_text->text = "--";
+        general_text->SetText( "--" );
     general_text->Draw(x+0.465+w*480/800+0.005,y+0.35+0.02,1.6,1.6);
 
     snprintf(temp,sizeof(temp),"VAL %4d",value);
-    general_text->text = (const char*)&temp;
+    general_text->SetText( (const char*)&temp );
     general_text->Draw(x+0.48+2*w*480/800+0.005,y+0.35+0.02,1.6,1.6);
 
 }
@@ -341,7 +341,7 @@ void ItemList::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
                 temp[20] = '-';
                 temp[21] = 0;
             }
-            general_text->text = temp;
+            general_text->SetText( temp );
             general_text->Draw(x+0.17,y+0.81-(effective_count*0.08),1.4,1.4);
             free(temp);
         }
@@ -350,29 +350,29 @@ void ItemList::Draw(GLfloat x,GLfloat y,GLfloat xscale, GLfloat yscale) {
             if((*i)->type != RADIO && (*i)->type != EXIT) {
                 selected_boxnub.Draw(x+0.14,y+0.808-(effective_count*0.08),1,1);
                 if((*i)->code == equipped->weapon || (*i)->code == equipped->apparel_legs) {
-                    general_text->text = "Unequip A)";
+                    general_text->SetText( "Unequip A)" );
                     general_text->Draw(equip_position,0.79,1.4,1.4);
                 }
                 else
                 {
                     if((*i)->type == AID) {
-                        general_text->text = "Use     A)";
+                        general_text->SetText( "Use     A)" );
                         general_text->Draw(equip_position,0.79,1.4,1.4);
                     }
                     else if((*i)->type == PANEL) {}
                     else {
-                        general_text->text = "Equip   A)";
+                        general_text->SetText( "Equip   A)" );
                         general_text->Draw(equip_position,0.79,1.4,1.4);
                     }
                 }
             }
             else { //radio
                 if(CurrentlyPlaying()) {
-                    general_text->text = "Untune   A)";
+                    general_text->SetText( "Untune   A)" );
                     general_text->Draw(equip_position,0.79,1.4,1.4);
                 }
                 else {
-                    general_text->text = "Tune     A)";
+                    general_text->SetText( "Tune     A)" );
                     general_text->Draw(equip_position,0.79,1.4,1.4);
                 }
             }
